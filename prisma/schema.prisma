@@ -16,9 +16,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projects    Project[]    @relation("ProjectOwner")
-  teamMembers TeamMember[]
-  stickyNotes StickyNote[]
+  projects            Project[]            @relation("ProjectOwner")
+  teamMembers         TeamMember[]
+  stickyNotes         StickyNote[]
+  careerAnchorResults CareerAnchorResult[] @relation("CareerAnchorResults")
 }
 
 model Project {
@@ -33,8 +34,9 @@ model Project {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  teams     Team[]
-  templates Template[]
+  teams              Team[]
+  templates          Template[]
+  careerAnchorResults CareerAnchorResult[]
 }
 
 model Team {
@@ -74,6 +76,20 @@ model Template {
   createdAt   DateTime @default(now())
 
   stickyNotes StickyNote[]
+}
+
+model CareerAnchorResult {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("CareerAnchorResults", fields: [userId], references: [id])
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  results   String   // JSON: { TF: 4.2, GM: 3.8, ... }
+  topAnchor String   // e.g. "TF"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, projectId])
 }
 
 model StickyNote {

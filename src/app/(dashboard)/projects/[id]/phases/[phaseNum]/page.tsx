@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
 import { phaseData, ThemeType } from "@/lib/phase-data";
 import CareerAnchorSurvey from "@/components/CareerAnchorSurvey";
+import TeamAnchorDashboard from "@/components/TeamAnchorDashboard";
 import CreateTemplateModal from "@/components/CreateTemplateModal";
 
 interface Template {
@@ -22,6 +23,12 @@ interface Project {
   currentPhase: number;
 }
 
+interface UserSession {
+  id: string;
+  role: "PROFESSOR" | "STUDENT";
+  name: string;
+}
+
 export default function PhaseDetailPage(
   props: { params: Promise<{ id: string; phaseNum: string }> }
 ) {
@@ -31,14 +38,16 @@ export default function PhaseDetailPage(
 
   const [project, setProject] = useState<Project | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [user, setUser] = useState<UserSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [projectRes, templatesRes] = await Promise.all([
+      const [projectRes, templatesRes, meRes] = await Promise.all([
         fetch(`/api/projects/${projectId}`),
         fetch(`/api/templates?projectId=${projectId}&phase=${phaseNum}`),
+        fetch("/api/auth/me"),
       ]);
 
       if (projectRes.ok) {
@@ -49,6 +58,11 @@ export default function PhaseDetailPage(
       if (templatesRes.ok) {
         const data = await templatesRes.json();
         setTemplates(data.templates);
+      }
+
+      if (meRes.ok) {
+        const data = await meRes.json();
+        setUser(data.user);
       }
     } catch {
       // error
@@ -100,6 +114,8 @@ export default function PhaseDetailPage(
     );
   }
 
+  const isProfessor = user?.role === "PROFESSOR";
+
   return (
     <div className="animate-fade-in">
       {/* Breadcrumb */}
@@ -136,13 +152,39 @@ export default function PhaseDetailPage(
             <p className="text-sm text-slate-400 mb-2">{currentPhaseInfo.subtitle}</p>
             <p className="text-slate-500">{currentPhaseInfo.description}</p>
           </div>
+          {isProfessor && phaseNum === 0 && (
+            <span className="shrink-0 text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">
+              교수 뷰
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Phase 0: Career Anchor Survey */}
+      {/* Phase 0: Career Anchor */}
       {phaseNum === 0 ? (
-        <div className="mb-8">
-          <CareerAnchorSurvey onComplete={(results) => console.log("Career anchor results:", results)} />
+        <div className="space-y-8">
+          {/* Professor: show only dashboard (no survey) */}
+          {isProfessor ? (
+            <div>
+              <div className="card p-5 mb-6 bg-indigo-50 border-indigo-100">
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm text-indigo-700">
+                    학생들의 커리어 앵커 검사 결과를 확인할 수 있습니다. 검사가 완료된 팀원들의 결과와 팀 밸런스 분석이 아래에 표시됩니다.
+                  </p>
+                </div>
+              </div>
+              <TeamAnchorDashboard projectId={projectId} />
+            </div>
+          ) : (
+            /* Student: show survey + dashboard */
+            <>
+              <CareerAnchorSurvey projectId={projectId} />
+              <TeamAnchorDashboard projectId={projectId} />
+            </>
+          )}
         </div>
       ) : (
         <>

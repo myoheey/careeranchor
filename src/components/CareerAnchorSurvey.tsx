@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   careerAnchorQuestions,
   careerAnchorCategories,
 } from "@/lib/phase-data";
 
 interface CareerAnchorSurveyProps {
-  onComplete: (results: Record<string, number>) => void;
+  projectId: string;
+  onComplete?: (results: Record<string, number>) => void;
 }
 
 const LIKERT_LABELS = [
@@ -22,16 +23,42 @@ const LIKERT_LABELS = [
 const QUESTIONS_PER_PAGE = 5;
 
 export default function CareerAnchorSurvey({
+  projectId,
   onComplete,
 }: CareerAnchorSurveyProps) {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [currentPage, setCurrentPage] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [existingResults, setExistingResults] = useState<Record<string, number> | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const totalQuestions = careerAnchorQuestions.length;
   const totalPages = Math.ceil(totalQuestions / QUESTIONS_PER_PAGE);
   const answeredCount = Object.keys(answers).length;
   const progress = (answeredCount / totalQuestions) * 100;
+
+  // Load existing results on mount
+  useEffect(() => {
+    async function loadExisting() {
+      try {
+        const res = await fetch(`/api/career-anchor?projectId=${projectId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.myResult) {
+            setExistingResults(data.myResult.results);
+            setShowResults(true);
+          }
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadExisting();
+  }, [projectId]);
 
   const currentQuestions = useMemo(() => {
     const start = currentPage * QUESTIONS_PER_PAGE;
@@ -55,6 +82,7 @@ export default function CareerAnchorSurvey({
 
   // Calculate results by category
   const results = useMemo(() => {
+    if (existingResults) return existingResults;
     if (!allAnswered) return null;
 
     const categoryResults: Record<string, number> = {};
@@ -67,7 +95,7 @@ export default function CareerAnchorSurvey({
       categoryResults[cat.key] = Math.round(avg * 100) / 100;
     }
     return categoryResults;
-  }, [answers, allAnswered]);
+  }, [answers, allAnswered, existingResults]);
 
   const sortedCategories = useMemo(() => {
     if (!results) return [];
@@ -83,10 +111,42 @@ export default function CareerAnchorSurvey({
     setShowResults(true);
   }, [results]);
 
-  const handleComplete = useCallback(() => {
+  const handleSave = useCallback(async () => {
     if (!results) return;
-    onComplete(results);
-  }, [results, onComplete]);
+    setSaving(true);
+
+    const topAnchor = [...careerAnchorCategories].sort(
+      (a, b) => (results[b.key] || 0) - (results[a.key] || 0)
+    )[0].key;
+
+    try {
+      const res = await fetch("/api/career-anchor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, results, topAnchor }),
+      });
+
+      if (res.ok) {
+        setSaved(true);
+        onComplete?.(results);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setSaving(false);
+    }
+  }, [results, projectId, onComplete]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <svg className="animate-spin w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      </div>
+    );
+  }
 
   // Results view
   if (showResults && results) {
@@ -100,7 +160,7 @@ export default function CareerAnchorSurvey({
             Career Anchor Assessment Results
           </p>
 
-          {/* Radar-like chart using CSS */}
+          {/* Bar chart */}
           <div className="mb-8">
             <div className="flex flex-col gap-3">
               {sortedCategories.map((cat) => {
@@ -166,7 +226,6 @@ export default function CareerAnchorSurvey({
 
                 return (
                   <div key={cat.key}>
-                    {/* Dot */}
                     <div
                       className="absolute w-3 h-3 rounded-full border-2 border-white shadow-md z-10"
                       style={{
@@ -176,7 +235,6 @@ export default function CareerAnchorSurvey({
                         transform: "translate(-50%, -50%)",
                       }}
                     />
-                    {/* Label */}
                     <div
                       className="absolute text-[9px] font-medium text-slate-500 whitespace-nowrap"
                       style={{
@@ -187,7 +245,6 @@ export default function CareerAnchorSurvey({
                     >
                       {cat.name}
                     </div>
-                    {/* Line from center to dot */}
                     <svg
                       className="absolute inset-0 w-full h-full pointer-events-none"
                       viewBox="0 0 100 100"
@@ -205,7 +262,6 @@ export default function CareerAnchorSurvey({
                   </div>
                 );
               })}
-              {/* Filled polygon */}
               <svg
                 className="absolute inset-0 w-full h-full pointer-events-none"
                 viewBox="0 0 100 100"
@@ -270,11 +326,29 @@ export default function CareerAnchorSurvey({
           </div>
         </div>
 
-        <div className="flex justify-center">
-          <button onClick={handleComplete} className="btn-primary text-base px-8 py-3">
-            결과 저장하고 계속하기
-          </button>
-        </div>
+        {/* Save button */}
+        {!existingResults && (
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={() => { setShowResults(false); setExistingResults(null); }}
+              className="px-6 py-3 rounded-xl text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors"
+            >
+              다시 검사하기
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving || saved}
+              className="btn-primary text-base px-8 py-3 disabled:opacity-60"
+            >
+              {saved ? "저장 완료!" : saving ? "저장 중..." : "결과 저장하기"}
+            </button>
+          </div>
+        )}
+        {existingResults && (
+          <div className="text-center">
+            <p className="text-sm text-slate-400">이미 검사를 완료했습니다.</p>
+          </div>
+        )}
       </div>
     );
   }
