@@ -67,9 +67,14 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
-            비밀번호
-          </label>
+          <div className="flex items-center justify-between mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+              비밀번호
+            </label>
+            <Link href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-500">
+              비밀번호를 잊으셨나요?
+            </Link>
+          </div>
           <input
             id="password"
             type="password"
