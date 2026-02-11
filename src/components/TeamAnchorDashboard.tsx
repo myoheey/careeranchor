@@ -73,7 +73,7 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <svg className="animate-spin w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24">
+        <svg className="animate-spin w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -83,13 +83,13 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
 
   if (memberResults.length === 0) {
     return (
-      <div className="card p-8 text-center">
-        <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+      <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
+        <div className="w-14 h-14 mx-auto mb-4 rounded-lg bg-slate-100 flex items-center justify-center">
           <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
-        <h3 className="text-base font-semibold text-slate-700 mb-2">
+        <h3 className="text-base font-semibold text-slate-900 mb-2">
           아직 검사 결과가 없습니다
         </h3>
         <p className="text-sm text-slate-500">
@@ -103,8 +103,8 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
     <div className="space-y-6 animate-fade-in">
       {/* Team Balance Analysis */}
       {teamAverage && insights && (
-        <div className="card p-6">
-          <h3 className="text-lg font-bold text-slate-900 mb-1">
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-1">
             팀 밸런스 분석
           </h3>
           <p className="text-sm text-slate-500 mb-6">
@@ -141,7 +141,7 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
                 return (
                   <div key={cat.key}>
                     <div
-                      className="absolute w-3 h-3 rounded-full border-2 border-white shadow-md z-10"
+                      className="absolute w-3 h-3 rounded-full border-2 border-white shadow-sm z-10"
                       style={{
                         backgroundColor: cat.color,
                         left: `${x}%`,
@@ -211,19 +211,19 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
                   return (
                     <div key={cat.key} className="flex items-center gap-3">
                       <div className="w-24 text-right">
-                        <span className="text-xs font-medium text-slate-600">
+                        <span className="text-xs font-medium text-slate-900">
                           {cat.name}
                         </span>
                       </div>
-                      <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="flex-1 h-6 bg-slate-100 rounded-md overflow-hidden">
                         <div
-                          className="h-full rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-2"
+                          className="h-full rounded-md transition-all duration-700 ease-out flex items-center justify-end pr-2"
                           style={{
                             width: `${Math.max(percentage, 5)}%`,
                             backgroundColor: cat.color,
                           }}
                         >
-                          <span className="text-[10px] font-bold text-white drop-shadow-sm">
+                          <span className="text-[10px] font-semibold text-white">
                             {score.toFixed(1)}
                           </span>
                         </div>
@@ -236,8 +236,8 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
 
           {/* Insights */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-              <h4 className="text-sm font-bold text-emerald-800 mb-2">
+            <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-100">
+              <h4 className="text-sm font-semibold text-emerald-800 mb-2">
                 팀 강점
               </h4>
               {insights.strengths.map((cat) => (
@@ -259,8 +259,8 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-              <h4 className="text-sm font-bold text-amber-800 mb-2">
+            <div className="p-4 rounded-lg bg-amber-50 border border-amber-100">
+              <h4 className="text-sm font-semibold text-amber-800 mb-2">
                 보완 필요
               </h4>
               {insights.weaknesses.map((cat) => (
@@ -286,8 +286,8 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
       )}
 
       {/* Team Member Results */}
-      <div className="card p-6">
-        <h3 className="text-lg font-bold text-slate-900 mb-1">
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-1">
           팀원 검사 결과
         </h3>
         <p className="text-sm text-slate-500 mb-4">
@@ -305,18 +305,15 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
             return (
               <div
                 key={member.userId}
-                className="p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
+                className="p-4 rounded-lg border border-slate-200"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                      style={{ backgroundColor: topCat?.color || "#94a3b8" }}
-                    >
+                    <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center text-white font-semibold text-sm">
                       {member.userName.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-800 text-sm">
+                      <p className="font-semibold text-slate-900 text-sm">
                         {member.userName}
                       </p>
                       <p className="text-xs text-slate-400">
@@ -326,7 +323,7 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
                   </div>
                   {topCat && (
                     <span
-                      className="text-xs font-bold px-3 py-1 rounded-full text-white"
+                      className="text-xs font-semibold px-3 py-1 rounded-lg text-white"
                       style={{ backgroundColor: topCat.color }}
                     >
                       {topCat.name}
@@ -346,9 +343,9 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
                             {cat.name}
                           </span>
                         </div>
-                        <div className="flex-1 h-4 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="flex-1 h-4 bg-slate-100 rounded-md overflow-hidden">
                           <div
-                            className="h-full rounded-full transition-all duration-500"
+                            className="h-full rounded-md transition-all duration-500"
                             style={{
                               width: `${Math.max(percentage, 5)}%`,
                               backgroundColor: cat.color,

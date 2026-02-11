@@ -79,7 +79,7 @@ export default function PhaseDetailPage(
     return (
       <div className="flex items-center justify-center py-20">
         <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -91,7 +91,7 @@ export default function PhaseDetailPage(
 
   if (!project) {
     return (
-      <div className="card p-12 text-center max-w-md mx-auto">
+      <div className="bg-white rounded-lg border border-slate-200 p-12 text-center max-w-md mx-auto">
         <p className="text-red-500 mb-4">프로젝트를 찾을 수 없습니다.</p>
         <Link href="/dashboard" className="btn-primary">
           대시보드로 돌아가기
@@ -105,7 +105,7 @@ export default function PhaseDetailPage(
 
   if (!currentPhaseInfo) {
     return (
-      <div className="card p-12 text-center max-w-md mx-auto">
+      <div className="bg-white rounded-lg border border-slate-200 p-12 text-center max-w-md mx-auto">
         <p className="text-red-500 mb-4">유효하지 않은 단계입니다.</p>
         <Link href={`/projects/${projectId}`} className="btn-primary">
           프로젝트로 돌아가기
@@ -120,24 +120,24 @@ export default function PhaseDetailPage(
     <div className="animate-fade-in">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6 flex-wrap">
-        <Link href="/dashboard" className="hover:text-indigo-600 transition-colors">
+        <Link href="/dashboard" className="hover:text-blue-600 transition-colors">
           대시보드
         </Link>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-        <Link href={`/projects/${projectId}`} className="hover:text-indigo-600 transition-colors">
+        <Link href={`/projects/${projectId}`} className="hover:text-blue-600 transition-colors">
           {project.title}
         </Link>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-        <span className="text-slate-700 font-medium">Phase {phaseNum}</span>
+        <span className="text-slate-900 font-medium">Phase {phaseNum}</span>
       </nav>
 
       {/* Phase Header */}
       <div
-        className="card p-6 sm:p-8 mb-8 relative overflow-hidden"
+        className="bg-white rounded-lg border border-slate-200 p-6 sm:p-8 mb-8"
         style={{ borderTop: `4px solid ${currentPhaseInfo.color}` }}
       >
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -146,14 +146,14 @@ export default function PhaseDetailPage(
               <span className="text-3xl">{currentPhaseInfo.icon}</span>
               <div>
                 <p className="text-xs text-slate-400 font-medium">Phase {phaseNum}</p>
-                <h1 className="text-2xl font-bold text-slate-900">{currentPhaseInfo.title}</h1>
+                <h1 className="text-2xl font-semibold text-slate-900">{currentPhaseInfo.title}</h1>
               </div>
             </div>
             <p className="text-sm text-slate-400 mb-2">{currentPhaseInfo.subtitle}</p>
             <p className="text-slate-500">{currentPhaseInfo.description}</p>
           </div>
           {isProfessor && phaseNum === 0 && (
-            <span className="shrink-0 text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">
+            <span className="shrink-0 text-[10px] font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg">
               교수 뷰
             </span>
           )}
@@ -166,12 +166,12 @@ export default function PhaseDetailPage(
           {/* Professor: show only dashboard (no survey) */}
           {isProfessor ? (
             <div>
-              <div className="card p-5 mb-6 bg-indigo-50 border-indigo-100">
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-5 mb-6">
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-sm text-indigo-700">
+                  <p className="text-sm text-blue-700">
                     학생들의 커리어 앵커 검사 결과를 확인할 수 있습니다. 검사가 완료된 팀원들의 결과와 팀 밸런스 분석이 아래에 표시됩니다.
                   </p>
                 </div>
@@ -191,7 +191,7 @@ export default function PhaseDetailPage(
           {/* Templates Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-slate-800">
+              <h2 className="text-lg font-semibold text-slate-900">
                 템플릿
                 <span className="text-sm font-normal text-slate-400 ml-2">
                   ({templates.length}개)
@@ -209,13 +209,13 @@ export default function PhaseDetailPage(
             </div>
 
             {templates.length === 0 ? (
-              <div className="card p-8 text-center">
-                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+              <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-lg bg-slate-100 flex items-center justify-center">
                   <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-base font-semibold text-slate-700 mb-2">
+                <h3 className="text-base font-semibold text-slate-900 mb-2">
                   아직 템플릿이 없습니다
                 </h3>
                 <p className="text-sm text-slate-500 mb-4">
@@ -234,21 +234,21 @@ export default function PhaseDetailPage(
                   <Link
                     key={template.id}
                     href={`/projects/${projectId}/board/${template.id}`}
-                    className="card p-5 hover:shadow-lg transition-all duration-200 group block"
+                    className="bg-white rounded-lg border border-slate-200 p-4 hover:shadow-sm transition-shadow block"
                   >
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                         </svg>
                       </div>
                       {template.isDefault && (
-                        <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
                           기본
                         </span>
                       )}
                     </div>
-                    <h3 className="font-semibold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">
+                    <h3 className="font-semibold text-slate-900 mb-1">
                       {template.title}
                     </h3>
                     {template.description && (
@@ -256,7 +256,7 @@ export default function PhaseDetailPage(
                         {template.description}
                       </p>
                     )}
-                    <div className="mt-3 flex items-center text-xs text-indigo-500 font-medium group-hover:gap-2 transition-all">
+                    <div className="mt-3 flex items-center text-xs text-blue-600 font-medium">
                       보드 열기
                       <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

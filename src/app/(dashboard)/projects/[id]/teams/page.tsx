@@ -142,7 +142,7 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -154,7 +154,7 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
 
   if (!project) {
     return (
-      <div className="card p-12 text-center max-w-md mx-auto">
+      <div className="bg-white border border-slate-200 rounded-lg p-12 text-center max-w-md mx-auto">
         <p className="text-red-500 mb-4">프로젝트를 찾을 수 없습니다.</p>
         <Link href="/dashboard" className="btn-primary">
           대시보드로 돌아가기
@@ -167,25 +167,25 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
     <div className="animate-fade-in">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6 flex-wrap">
-        <Link href="/dashboard" className="hover:text-indigo-600 transition-colors">
+        <Link href="/dashboard" className="hover:text-blue-600 transition-colors">
           대시보드
         </Link>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-        <Link href={`/projects/${projectId}`} className="hover:text-indigo-600 transition-colors">
+        <Link href={`/projects/${projectId}`} className="hover:text-blue-600 transition-colors">
           {project.title}
         </Link>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-        <span className="text-slate-700 font-medium">팀 관리</span>
+        <span className="text-slate-900 font-medium">팀 관리</span>
       </nav>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">팀 관리</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">팀 관리</h1>
           <p className="text-slate-500 mt-1">
             {project.teams.length}개의 팀이 등록되어 있습니다
           </p>
@@ -205,12 +205,12 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
 
       {/* Create Team Form */}
       {showCreateTeam && (
-        <div className="card p-6 mb-6 animate-fade-in">
-          <h3 className="font-semibold text-slate-800 mb-4">새 팀 만들기</h3>
+        <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6 animate-fade-in">
+          <h3 className="font-semibold text-slate-900 mb-4">새 팀 만들기</h3>
           <form onSubmit={createTeam}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-slate-600 mb-1">
+                <label className="block text-sm font-medium text-slate-500 mb-1">
                   팀 이름
                 </label>
                 <input
@@ -223,7 +223,7 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600 mb-1">
+                <label className="block text-sm font-medium text-slate-500 mb-1">
                   주제 <span className="text-slate-400 font-normal">(선택)</span>
                 </label>
                 <input
@@ -257,13 +257,13 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
 
       {/* Teams List */}
       {project.teams.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+        <div className="bg-white border border-slate-200 rounded-lg p-12 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
             <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-slate-700 mb-2">아직 팀이 없습니다</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">아직 팀이 없습니다</h3>
           <p className="text-sm text-slate-500">
             {isProfessor
               ? "새 팀을 만들어 학생들이 참여할 수 있도록 하세요"
@@ -275,15 +275,15 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
           {project.teams.map((team) => {
             const isMember = isInTeam(team);
             return (
-              <div key={team.id} className="card p-6">
+              <div key={team.id} className="bg-white border border-slate-200 rounded-lg p-5">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-800">{team.name}</h3>
+                    <h3 className="text-lg font-semibold text-slate-900">{team.name}</h3>
                     {team.topic && (
                       <p className="text-sm text-slate-500 mt-0.5">{team.topic}</p>
                     )}
                   </div>
-                  <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">
+                  <span className="text-xs font-medium text-slate-400 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full">
                     {team.members.length}명
                   </span>
                 </div>
@@ -298,14 +298,14 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
                         key={member.id}
                         className="flex items-center gap-3 py-2 px-3 rounded-lg bg-slate-50"
                       >
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                           {member.user.name.charAt(0)}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-slate-700 truncate">
+                          <p className="text-sm font-medium text-slate-900 truncate">
                             {member.user.name}
                             {member.userId === userId && (
-                              <span className="text-xs text-indigo-500 ml-1">(나)</span>
+                              <span className="text-xs text-blue-600 ml-1">(나)</span>
                             )}
                           </p>
                           <p className="text-xs text-slate-400 truncate">{member.user.email}</p>
@@ -317,7 +317,7 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
 
                 {/* Student Actions */}
                 {!isProfessor && (
-                  <div className="pt-3 border-t border-slate-100">
+                  <div className="pt-3 border-t border-slate-200">
                     {isMember ? (
                       <button
                         onClick={() => leaveTeam(team.id)}
