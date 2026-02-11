@@ -56,16 +56,6 @@ export default function JoinProjectModal({
     return labels[theme] || theme;
   };
 
-  const themeColor = (theme: string) => {
-    const colors: Record<string, string> = {
-      STARTUP: "text-red-600 bg-red-50",
-      JOB_CREATION: "text-blue-600 bg-blue-50",
-      PROBLEM_SOLVING: "text-green-600 bg-green-50",
-    };
-    return colors[theme] || "text-slate-600 bg-slate-50";
-  };
-
-  // Search project by join code
   const handleSearch = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -95,7 +85,7 @@ export default function JoinProjectModal({
         setError(
           err instanceof Error
             ? err.message
-            : "프로젝트를 찾을 수 없습니다. 코드를 다시 확인해주세요."
+            : "프로젝트를 찾을 수 없습니다."
         );
       } finally {
         setLoading(false);
@@ -104,7 +94,6 @@ export default function JoinProjectModal({
     [joinCode]
   );
 
-  // Join the project
   const handleJoin = useCallback(async () => {
     if (!project) return;
 
@@ -134,75 +123,38 @@ export default function JoinProjectModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
       onClick={handleBackdropClick}
     >
       <div
         ref={modalRef}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-slide-up"
+        className="bg-white rounded-lg shadow-lg w-full max-w-sm mx-4 animate-fade-in"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-              <svg
-                className="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-900">
-                프로젝트 참여
-              </h3>
-              <p className="text-xs text-slate-400">
-                참여 코드를 입력하세요
-              </p>
-            </div>
+        <div className="flex items-center justify-between p-5 border-b border-slate-100">
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">프로젝트 참여</h3>
+            <p className="text-xs text-slate-500 mt-0.5">참여 코드를 입력하세요</p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-6">
+        <div className="p-5">
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600">
+            <div className="mb-3 p-2.5 rounded-lg bg-red-50 border border-red-200 text-sm text-red-600">
               {error}
             </div>
           )}
 
-          {/* Search form */}
           <form onSubmit={handleSearch} className="mb-4">
-            <label
-              htmlFor="join-code"
-              className="block text-sm font-medium text-slate-700 mb-1.5"
-            >
-              참여 코드 <span className="text-red-400">*</span>
+            <label htmlFor="join-code" className="block text-sm font-medium text-slate-700 mb-1">
+              참여 코드
             </label>
             <div className="flex gap-2">
               <input
@@ -215,127 +167,53 @@ export default function JoinProjectModal({
                   setProject(null);
                   setError("");
                 }}
-                placeholder="예: A1B2C3D4"
-                className="flex-1 font-mono text-center text-lg tracking-widest uppercase"
+                placeholder="A1B2C3D4"
+                className="flex-1 font-mono text-center tracking-widest uppercase"
                 maxLength={8}
               />
               <button
                 type="submit"
                 disabled={loading || !joinCode.trim()}
-                className="btn-primary text-sm shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                )}
+                {loading ? "..." : "검색"}
               </button>
             </div>
           </form>
 
-          {/* Project preview */}
           {project && (
-            <div className="card p-4 border-2 border-indigo-100 bg-indigo-50/30 animate-fade-in">
-              <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-2xl shrink-0">
-                  {project.theme === "STARTUP"
-                    ? "🚀"
-                    : project.theme === "JOB_CREATION"
-                    ? "💼"
-                    : "🔧"}
-                </div>
+            <div className="p-4 rounded-lg border border-blue-200 bg-blue-50/50 animate-fade-in">
+              <div className="flex items-center gap-3 mb-3">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-slate-900 truncate">
+                  <h4 className="font-semibold text-slate-900 text-sm truncate">
                     {project.name}
                   </h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${themeColor(
-                        project.theme
-                      )}`}
-                    >
-                      {themeLabel(project.theme)}
-                    </span>
-                    <span className="text-xs text-slate-500">
-                      {project.professorName}
-                    </span>
-                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {themeLabel(project.theme)} &middot; {project.professorName}
+                  </p>
                 </div>
               </div>
-
               <button
                 onClick={handleJoin}
                 disabled={joining}
-                className="w-full btn-accent text-sm mt-4 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full btn-primary justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {joining ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    참여 중...
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                      />
-                    </svg>
-                    이 프로젝트에 참여하기
-                  </>
-                )}
+                {joining ? "참여 중..." : "이 프로젝트에 참여하기"}
               </button>
             </div>
           )}
 
-          {/* Hint */}
           {!project && !error && (
-            <div className="flex items-start gap-2 p-3 bg-slate-50 rounded-xl">
-              <svg
-                className="w-4 h-4 text-slate-400 mt-0.5 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                교수님이 공유한 8자리 참여 코드를 입력하세요. 코드는 대소문자를
-                구분하지 않습니다.
-              </p>
-            </div>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              교수님이 공유한 8자리 참여 코드를 입력하세요.
+            </p>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-6 pb-6">
+        <div className="px-5 pb-5">
           <button
             onClick={onClose}
-            className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-center"
+            className="w-full btn-outline justify-center"
           >
             닫기
           </button>

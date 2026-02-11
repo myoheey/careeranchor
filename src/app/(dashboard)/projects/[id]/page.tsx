@@ -133,7 +133,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
     return (
       <div className="flex items-center justify-center py-20">
         <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -145,7 +145,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
 
   if (error || !project) {
     return (
-      <div className="card p-12 text-center max-w-md mx-auto">
+      <div className="bg-white border border-slate-200 rounded-lg p-12 text-center max-w-md mx-auto">
         <p className="text-red-500 mb-4">{error || "프로젝트를 찾을 수 없습니다."}</p>
         <Link href="/dashboard" className="btn-primary">
           대시보드로 돌아가기
@@ -162,28 +162,28 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
     <div className="animate-fade-in">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6">
-        <Link href="/dashboard" className="hover:text-indigo-600 transition-colors">
+        <Link href="/dashboard" className="hover:text-blue-600 transition-colors">
           대시보드
         </Link>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-        <span className="text-slate-700 font-medium">{project.title}</span>
+        <span className="text-slate-900 font-medium">{project.title}</span>
       </nav>
 
       {/* Project Header */}
-      <div className="card p-6 sm:p-8 mb-8">
+      <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${theme.bg} ${theme.color}`}>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${theme.bg} ${theme.color}`}>
                 {themeLabels[project.theme]}
               </span>
               <span className="text-xs text-slate-400">
                 Phase {project.currentPhase} / 4
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 mb-2">
               {project.title}
             </h1>
             {project.description && (
@@ -194,10 +194,10 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
           {/* Join Code (Professor) */}
           {isProfessor && (
             <div className="flex-shrink-0">
-              <div className="bg-slate-50 rounded-xl p-4 text-center min-w-[160px]">
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-center min-w-[160px]">
                 <p className="text-xs text-slate-400 mb-1">참여 코드</p>
                 <div className="flex items-center justify-center gap-2">
-                  <code className="text-xl font-bold text-indigo-600 tracking-wider">
+                  <code className="text-xl font-semibold text-blue-600 tracking-wider">
                     {project.joinCode}
                   </code>
                   <button
@@ -225,7 +225,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
       {/* Phase Timeline */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-slate-800">학습 단계</h2>
+          <h2 className="text-lg font-semibold text-slate-900">학습 단계</h2>
           {isProfessor && project.currentPhase < 4 && (
             <button
               onClick={advancePhase}
@@ -251,55 +251,59 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
                 {/* Connector line (desktop only) */}
                 {phase.phase > 0 && (
                   <div className={`hidden sm:block absolute top-6 -left-4 w-4 h-0.5 ${
-                    isCompleted || isActive ? "bg-indigo-400" : "bg-slate-200"
+                    isCompleted || isActive ? "bg-blue-400" : "bg-slate-200"
                   }`} />
                 )}
 
                 {isLocked ? (
                   <div
-                    className="phase-card card p-4 opacity-50 cursor-not-allowed"
-                    style={{ "--phase-color": phase.color } as React.CSSProperties}
+                    className="bg-white border border-slate-200 rounded-lg overflow-hidden opacity-50 cursor-not-allowed"
+                    style={{ borderTopWidth: "3px", borderTopColor: "#cbd5e1" } as React.CSSProperties}
                   >
-                    <div className="text-2xl mb-2 grayscale">{phase.icon}</div>
-                    <p className="text-xs text-slate-400 mb-0.5">Phase {phase.phase}</p>
-                    <h3 className="text-sm font-bold text-slate-500 mb-1">{phase.title}</h3>
-                    <p className="text-xs text-slate-400 line-clamp-2">{phase.description}</p>
-                    <div className="mt-2">
-                      <svg className="w-4 h-4 text-slate-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
+                    <div className="p-4">
+                      <div className="text-2xl mb-2 grayscale">{phase.icon}</div>
+                      <p className="text-xs text-slate-400 mb-0.5">Phase {phase.phase}</p>
+                      <h3 className="text-sm font-semibold text-slate-500 mb-1">{phase.title}</h3>
+                      <p className="text-xs text-slate-400 line-clamp-2">{phase.description}</p>
+                      <div className="mt-2">
+                        <svg className="w-4 h-4 text-slate-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 ) : (
                   <Link
                     href={`/projects/${project.id}/phases/${phase.phase}`}
-                    className={`phase-card card p-4 block hover:shadow-lg transition-all duration-200 ${
-                      isActive ? "ring-2 ring-indigo-500 ring-offset-2" : ""
+                    className={`block bg-white border border-slate-200 rounded-lg overflow-hidden transition-colors ${
+                      isActive ? "ring-2 ring-blue-500 ring-offset-2" : "hover:border-slate-300"
                     }`}
-                    style={{ "--phase-color": phase.color } as React.CSSProperties}
+                    style={{ borderTopWidth: "3px", borderTopColor: phase.color } as React.CSSProperties}
                   >
-                    <div className="text-2xl mb-2">{phase.icon}</div>
-                    <p className="text-xs text-slate-400 mb-0.5">Phase {phase.phase}</p>
-                    <h3 className="text-sm font-bold text-slate-800 mb-1">{phase.title}</h3>
-                    <p className="text-xs text-slate-500 line-clamp-2">{phase.description}</p>
-                    {isActive && (
-                      <div className="mt-2">
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
-                          <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse" />
-                          현재 단계
-                        </span>
-                      </div>
-                    )}
-                    {isCompleted && (
-                      <div className="mt-2">
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          완료
-                        </span>
-                      </div>
-                    )}
+                    <div className="p-4">
+                      <div className="text-2xl mb-2">{phase.icon}</div>
+                      <p className="text-xs text-slate-400 mb-0.5">Phase {phase.phase}</p>
+                      <h3 className="text-sm font-semibold text-slate-900 mb-1">{phase.title}</h3>
+                      <p className="text-xs text-slate-500 line-clamp-2">{phase.description}</p>
+                      {isActive && (
+                        <div className="mt-2">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                            현재 단계
+                          </span>
+                        </div>
+                      )}
+                      {isCompleted && (
+                        <div className="mt-2">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            완료
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </Link>
                 )}
               </div>
@@ -309,9 +313,9 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
       </div>
 
       {/* Teams Section */}
-      <div className="card p-6 sm:p-8">
+      <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-slate-800">
+          <h2 className="text-lg font-semibold text-slate-900">
             팀 목록
             <span className="text-sm font-normal text-slate-400 ml-2">
               ({project.teams.length}개)
@@ -320,7 +324,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
           <div className="flex gap-2">
             <Link
               href={`/projects/${project.id}/teams`}
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50"
+              className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-blue-50"
             >
               전체 보기
             </Link>
@@ -340,7 +344,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
 
         {/* Create Team Form */}
         {showCreateTeam && (
-          <form onSubmit={createTeam} className="mb-6 bg-slate-50 rounded-xl p-4 animate-fade-in">
+          <form onSubmit={createTeam} className="mb-6 bg-slate-50 border border-slate-200 rounded-lg p-4 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">팀 이름</label>
@@ -391,8 +395,8 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {project.teams.map((team) => (
-              <div key={team.id} className="bg-slate-50 rounded-xl p-4 hover:bg-slate-100 transition-colors">
-                <h3 className="font-semibold text-slate-800 mb-1">{team.name}</h3>
+              <div key={team.id} className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <h3 className="font-semibold text-slate-900 mb-1">{team.name}</h3>
                 {team.topic && (
                   <p className="text-xs text-slate-500 mb-2">{team.topic}</p>
                 )}
@@ -402,7 +406,7 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
                       key={member.id}
                       className="inline-flex items-center gap-1 text-xs bg-white border border-slate-200 rounded-full px-2 py-0.5"
                     >
-                      <span className="w-4 h-4 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-[10px] font-bold">
+                      <span className="w-4 h-4 rounded-full bg-slate-700 flex items-center justify-center text-white text-[10px] font-semibold">
                         {member.user.name.charAt(0)}
                       </span>
                       {member.user.name}

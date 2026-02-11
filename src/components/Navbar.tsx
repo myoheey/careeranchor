@@ -20,7 +20,6 @@ export default function Navbar({ user: userProp }: NavbarProps) {
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Sync from prop directly (not in effect)
   if (userProp !== undefined && userProp !== user) {
     setUser(userProp);
   }
@@ -36,7 +35,7 @@ export default function Navbar({ user: userProp }: NavbarProps) {
           setUser(data.user);
         }
       } catch {
-        // user not logged in
+        // not logged in
       }
     };
     fetchUser();
@@ -49,9 +48,7 @@ export default function Navbar({ user: userProp }: NavbarProps) {
         setMobileMenuOpen(false);
       }
     };
-    if (mobileMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    if (mobileMenuOpen) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [mobileMenuOpen]);
 
@@ -66,108 +63,53 @@ export default function Navbar({ user: userProp }: NavbarProps) {
     }
   }, [router]);
 
-  const isProfessor = user?.role === "PROFESSOR";
-
-  const navLinks = (
-    <>
-      <Link
-        href="/dashboard"
-        className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-lg hover:bg-indigo-50"
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        Dashboard
-      </Link>
-      {isProfessor && (
-        <Link
-          href="/projects"
-          className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-lg hover:bg-indigo-50"
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          My Projects
-        </Link>
-      )}
-    </>
-  );
-
-  const roleBadge = user && (
-    <span
-      className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-        user.role === "PROFESSOR"
-          ? "bg-indigo-100 text-indigo-700"
-          : "bg-orange-100 text-orange-700"
-      }`}
-    >
-      {user.role}
-    </span>
-  );
-
   return (
-    <nav className="sticky top-0 z-50 glass border-b border-slate-200/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-500 bg-clip-text text-transparent">
-              EntrePreneur LMS
-            </span>
+    <nav className="sticky top-0 z-50 bg-navy border-b border-slate-800">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex items-center justify-between h-14">
+          <Link href="/dashboard" className="text-base font-bold text-white tracking-tight">
+            Entre<span className="text-blue-400">LMS</span>
           </Link>
 
-          {/* Desktop nav */}
           {user && (
-            <div className="hidden md:flex items-center gap-1">
-              {navLinks}
-            </div>
-          )}
-
-          {/* Desktop user section */}
-          {user && (
-            <div className="hidden md:flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-sm font-semibold">
-                  {user.name.charAt(0).toUpperCase()}
+            <div className="hidden md:flex items-center gap-6">
+              <Link href="/dashboard" className="text-sm text-slate-400 hover:text-white transition-colors">
+                대시보드
+              </Link>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-white text-xs font-medium">
+                    {user.name.charAt(0)}
+                  </div>
+                  <span className="text-sm text-slate-300">{user.name}</span>
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                    user.role === "PROFESSOR" ? "bg-blue-500/20 text-blue-400" : "bg-amber-500/20 text-amber-400"
+                  }`}>
+                    {user.role === "PROFESSOR" ? "교수" : "학생"}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-slate-700">
-                  {user.name}
-                </span>
-                {roleBadge}
+                <button
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="text-xs text-slate-500 hover:text-slate-300 transition-colors disabled:opacity-50"
+                >
+                  로그아웃
+                </button>
               </div>
-              <button
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors px-3 py-2 rounded-lg hover:bg-red-50 disabled:opacity-50"
-              >
-                {loggingOut ? "..." : "Logout"}
-              </button>
             </div>
           )}
 
-          {/* Mobile menu button */}
           {user && (
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
+              className="md:hidden p-1.5 rounded text-slate-400 hover:text-white transition-colors"
               aria-label="Toggle menu"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
             </button>
@@ -175,34 +117,26 @@ export default function Navbar({ user: userProp }: NavbarProps) {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {user && mobileMenuOpen && (
-        <div
-          ref={menuRef}
-          className="md:hidden border-t border-slate-200/60 bg-white/95 backdrop-blur-md animate-fade-in"
-        >
-          <div className="px-4 py-3 space-y-1">
-            <div className="flex items-center gap-2 pb-3 mb-2 border-b border-slate-100">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-sm font-semibold">
-                {user.name.charAt(0).toUpperCase()}
+        <div ref={menuRef} className="md:hidden border-t border-slate-800 bg-navy animate-fade-in">
+          <div className="px-6 py-4 space-y-3">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
+              <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-white text-xs font-medium">
+                {user.name.charAt(0)}
               </div>
-              <span className="text-sm font-medium text-slate-700">
-                {user.name}
+              <span className="text-sm text-slate-300">{user.name}</span>
+              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                user.role === "PROFESSOR" ? "bg-blue-500/20 text-blue-400" : "bg-amber-500/20 text-amber-400"
+              }`}>
+                {user.role === "PROFESSOR" ? "교수" : "학생"}
               </span>
-              {roleBadge}
             </div>
-            <div className="flex flex-col gap-1">
-              {navLinks}
-            </div>
-            <div className="pt-2 mt-2 border-t border-slate-100">
-              <button
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="w-full text-left text-sm font-medium text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
-              >
-                {loggingOut ? "Logging out..." : "Logout"}
-              </button>
-            </div>
+            <Link href="/dashboard" className="block text-sm text-slate-400 hover:text-white py-1" onClick={() => setMobileMenuOpen(false)}>
+              대시보드
+            </Link>
+            <button onClick={handleLogout} disabled={loggingOut} className="text-sm text-red-400 hover:text-red-300 disabled:opacity-50">
+              {loggingOut ? "로그아웃 중..." : "로그아웃"}
+            </button>
           </div>
         </div>
       )}
