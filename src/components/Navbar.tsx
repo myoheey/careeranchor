@@ -20,15 +20,18 @@ export default function Navbar({ user: userProp }: NavbarProps) {
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Sync from prop directly (not in effect)
+  if (userProp !== undefined && userProp !== user) {
+    setUser(userProp);
+  }
+
   useEffect(() => {
-    if (userProp !== undefined) {
-      setUser(userProp);
-      return;
-    }
+    if (userProp !== undefined) return;
+    let cancelled = false;
     const fetchUser = async () => {
       try {
         const res = await fetch("/api/auth/me");
-        if (res.ok) {
+        if (res.ok && !cancelled) {
           const data = await res.json();
           setUser(data.user);
         }
@@ -37,6 +40,7 @@ export default function Navbar({ user: userProp }: NavbarProps) {
       }
     };
     fetchUser();
+    return () => { cancelled = true; };
   }, [userProp]);
 
   useEffect(() => {

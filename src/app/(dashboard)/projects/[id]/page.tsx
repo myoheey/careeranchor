@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, use } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { phaseData, themeLabels, ThemeType } from "@/lib/phase-data";
 
@@ -35,7 +34,6 @@ const themeConfig: Record<string, { color: string; bg: string; border: string }>
 
 export default function ProjectDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);
-  const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

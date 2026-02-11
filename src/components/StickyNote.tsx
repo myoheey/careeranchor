@@ -48,29 +48,13 @@ export default function StickyNote({
   onDelete,
   isOwner,
 }: StickyNoteProps) {
-  const [isDragging, setIsDragging] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(content);
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [position, setPosition] = useState({ x: posX, y: posY });
 
   const noteRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const dragOffset = useRef({ x: 0, y: 0 });
-
-  // Sync position from props when not dragging
-  useEffect(() => {
-    if (!isDragging) {
-      setPosition({ x: posX, y: posY });
-    }
-  }, [posX, posY, isDragging]);
-
-  // Sync content from props when not editing
-  useEffect(() => {
-    if (!isEditing) {
-      setEditContent(content);
-    }
-  }, [content, isEditing]);
+  const dragState = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
 
   // Focus textarea when editing starts
   useEffect(() => {
@@ -80,53 +64,73 @@ export default function StickyNote({
     }
   }, [isEditing]);
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
+  // Drag via DOM manipulation (avoids React state in effect)
+  useEffect(() => {
+    const el = noteRef.current;
+    if (!el) return;
+
+    const handleMouseDown = (e: MouseEvent) => {
       if (isEditing || showColorPicker) return;
+      const target = e.target as HTMLElement;
+      if (target.tagName === "BUTTON" || target.tagName === "TEXTAREA") return;
+
       e.preventDefault();
       e.stopPropagation();
-      const rect = noteRef.current?.getBoundingClientRect();
-      if (!rect) return;
-
-      dragOffset.current = {
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
+      dragState.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        origX: posX,
+        origY: posY,
       };
-      setIsDragging(true);
-    },
-    [isEditing, showColorPicker, position]
-  );
-
-  useEffect(() => {
-    if (!isDragging) return;
+      el.style.zIndex = "100";
+      el.style.cursor = "grabbing";
+      el.classList.add("dragging");
+    };
 
     const handleMouseMove = (e: MouseEvent) => {
-      const newX = e.clientX - dragOffset.current.x;
-      const newY = e.clientY - dragOffset.current.y;
-      setPosition({ x: Math.max(0, newX), y: Math.max(0, newY) });
+      if (!dragState.current) return;
+      const dx = e.clientX - dragState.current.startX;
+      const dy = e.clientY - dragState.current.startY;
+      const newX = Math.max(0, dragState.current.origX + dx);
+      const newY = Math.max(0, dragState.current.origY + dy);
+      el.style.left = `${newX}px`;
+      el.style.top = `${newY}px`;
     };
 
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      onUpdate(id, { posX: position.x, posY: position.y });
+    const handleMouseUp = (e: MouseEvent) => {
+      if (!dragState.current) return;
+      const dx = e.clientX - dragState.current.startX;
+      const dy = e.clientY - dragState.current.startY;
+      const newX = Math.max(0, dragState.current.origX + dx);
+      const newY = Math.max(0, dragState.current.origY + dy);
+      dragState.current = null;
+      el.style.zIndex = "1";
+      el.style.cursor = "grab";
+      el.classList.remove("dragging");
+      if (dx !== 0 || dy !== 0) {
+        onUpdate(id, { posX: newX, posY: newY });
+      }
     };
 
+    el.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
+      el.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, id, onUpdate, position.x, position.y]);
+  }, [id, posX, posY, isEditing, showColorPicker, onUpdate]);
 
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       if (!isOwner) return;
       e.stopPropagation();
+      setEditContent(content);
       setIsEditing(true);
     },
-    [isOwner]
+    [isOwner, content]
   );
 
   const handleEditBlur = useCallback(() => {
@@ -169,19 +173,16 @@ export default function StickyNote({
   return (
     <div
       ref={noteRef}
-      className={`sticky-note absolute rounded-lg select-none group ${
-        isDragging ? "dragging" : ""
-      }`}
+      className="sticky-note absolute rounded-lg select-none group"
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        left: `${posX}px`,
+        top: `${posY}px`,
         width: `${width}px`,
         minHeight: `${height}px`,
         backgroundColor: color,
-        zIndex: isDragging ? 100 : 1,
-        cursor: isDragging ? "grabbing" : "grab",
+        zIndex: 1,
+        cursor: "grab",
       }}
-      onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
     >
       {/* Delete button */}
