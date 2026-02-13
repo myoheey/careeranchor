@@ -16,9 +16,9 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="card p-6 text-center">
-        <p className="text-sm text-red-500 mb-4">유효하지 않은 링크입니다.</p>
-        <Link href="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+      <div className="text-center">
+        <p className="text-sm text-red-600 mb-4">유효하지 않은 링크입니다.</p>
+        <Link href="/forgot-password" className="text-sm font-medium text-primary hover:text-primary-light transition-colors">
           비밀번호 재설정 다시 요청
         </Link>
       </div>
@@ -65,17 +65,17 @@ function ResetPasswordForm() {
 
   if (done) {
     return (
-      <div className="card p-6 text-center">
-        <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-emerald-50 flex items-center justify-center">
-          <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="text-center">
+        <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-primary/8 flex items-center justify-center">
+          <svg className="w-6 h-6 text-primary-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-lg font-semibold text-slate-900 mb-2">비밀번호 변경 완료</h1>
-        <p className="text-sm text-slate-500 mb-6">
+        <h1 className="text-xl font-bold text-text mb-2">비밀번호 변경 완료</h1>
+        <p className="text-sm text-text-muted mb-6">
           새 비밀번호로 로그인할 수 있습니다.
         </p>
-        <Link href="/login" className="btn-primary inline-flex justify-center px-6 py-2.5">
+        <Link href="/login" className="btn-primary inline-flex justify-center px-6 py-3">
           로그인하기
         </Link>
       </div>
@@ -83,23 +83,23 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="card p-6">
-      <div className="mb-6">
-        <h1 className="text-lg font-semibold text-slate-900">새 비밀번호 설정</h1>
-        <p className="text-sm text-slate-500 mt-1">
+    <div>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-text">새 비밀번호 설정</h1>
+        <p className="text-sm text-text-muted mt-2">
           새로운 비밀번호를 입력해주세요.
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-sm">
+        <div className="mb-5 bg-red-50 border border-red-200/60 text-red-700 px-4 py-3 rounded-lg text-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-text-secondary mb-1.5">
             새 비밀번호
           </label>
           <input
@@ -114,7 +114,7 @@ function ResetPasswordForm() {
         </div>
 
         <div>
-          <label htmlFor="confirm" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="confirm" className="block text-sm font-medium text-text-secondary mb-1.5">
             비밀번호 확인
           </label>
           <input
@@ -131,7 +131,7 @@ function ResetPasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="btn-primary w-full justify-center py-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="btn-primary w-full justify-center py-3 text-base disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? "변경 중..." : "비밀번호 변경"}
         </button>
@@ -144,8 +144,8 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="card p-6 text-center">
-          <p className="text-sm text-slate-500">로딩 중...</p>
+        <div className="text-center">
+          <p className="text-sm text-text-muted">로딩 중...</p>
         </div>
       }
     >

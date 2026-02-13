@@ -1,41 +1,62 @@
 @import "tailwindcss";
 
 :root {
-  --navy: #0f172a;
-  --navy-light: #1e293b;
-  --navy-lighter: #334155;
-  --blue: #2563eb;
-  --blue-dark: #1d4ed8;
-  --blue-light: #3b82f6;
-  --surface: #ffffff;
-  --surface-secondary: #f8fafc;
-  --border: #e2e8f0;
-  --border-light: #f1f5f9;
-  --text: #0f172a;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
+  /* Primary - Deep Forest Green */
+  --primary: #1B4332;
+  --primary-light: #2D6A4F;
+  --primary-lighter: #40916C;
+  --primary-soft: #52B788;
+
+  /* Accent - Warm Gold */
+  --accent: #B68D40;
+  --accent-light: #D4A574;
+  --accent-soft: #F2E8CF;
+
+  /* Surfaces */
+  --surface: #FFFFFF;
+  --surface-warm: #FAFAF5;
+  --surface-secondary: #F5F5F0;
+
+  /* Borders */
+  --border: #E5E2DB;
+  --border-light: #EFEEE8;
+
+  /* Text */
+  --text: #1A1A1A;
+  --text-secondary: #4A5043;
+  --text-muted: #8C8C82;
+
+  /* Theme colors */
+  --theme-startup: #C05746;
+  --theme-job: #3B7DD8;
+  --theme-problem: #2D6A4F;
 }
 
 @theme inline {
-  --color-navy: var(--navy);
-  --color-navy-light: var(--navy-light);
-  --color-navy-lighter: var(--navy-lighter);
-  --color-blue: var(--blue);
-  --color-blue-dark: var(--blue-dark);
-  --color-blue-light: var(--blue-light);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-lighter: var(--primary-lighter);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-soft: var(--accent-soft);
   --color-surface: var(--surface);
+  --color-surface-warm: var(--surface-warm);
   --color-surface-secondary: var(--surface-secondary);
   --color-border: var(--border);
   --color-border-light: var(--border-light);
   --color-text: var(--text);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-theme-startup: var(--theme-startup);
+  --color-theme-job: var(--theme-job);
+  --color-theme-problem: var(--theme-problem);
+  --font-sans: "Pretendard", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 }
 
 body {
-  background: var(--surface-secondary);
+  background: var(--surface-warm);
   color: var(--text);
   font-family: var(--font-sans);
 }
@@ -46,19 +67,37 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.3s ease forwards;
 }
 
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease forwards;
+}
+
 /* Buttons */
 .btn-primary {
-  background: var(--blue);
+  background: var(--primary);
   color: white;
-  padding: 0.5rem 1.25rem;
+  padding: 0.625rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 0.875rem;
-  transition: background 0.15s ease;
+  transition: all 0.2s ease;
   border: none;
   cursor: pointer;
   display: inline-flex;
@@ -67,18 +106,20 @@ body {
 }
 
 .btn-primary:hover {
-  background: var(--blue-dark);
+  background: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2);
 }
 
 .btn-secondary {
-  background: var(--navy);
-  color: white;
-  padding: 0.5rem 1.25rem;
+  background: var(--surface);
+  color: var(--primary);
+  padding: 0.625rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 0.875rem;
-  transition: background 0.15s ease;
-  border: none;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -86,17 +127,19 @@ body {
 }
 
 .btn-secondary:hover {
-  background: var(--navy-light);
+  background: var(--surface-secondary);
+  border-color: var(--primary-lighter);
+  transform: translateY(-1px);
 }
 
 .btn-outline {
   background: transparent;
-  color: var(--navy);
-  padding: 0.5rem 1.25rem;
+  color: var(--text);
+  padding: 0.625rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 0.875rem;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   border: 1px solid var(--border);
   cursor: pointer;
   display: inline-flex;
@@ -106,17 +149,17 @@ body {
 
 .btn-outline:hover {
   background: var(--surface-secondary);
-  border-color: var(--navy-lighter);
+  border-color: var(--primary-lighter);
 }
 
 .btn-accent {
-  background: #f59e0b;
+  background: var(--accent);
   color: white;
-  padding: 0.5rem 1.25rem;
+  padding: 0.625rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 0.875rem;
-  transition: background 0.15s ease;
+  transition: all 0.2s ease;
   border: none;
   cursor: pointer;
   display: inline-flex;
@@ -125,7 +168,9 @@ body {
 }
 
 .btn-accent:hover {
-  background: #d97706;
+  background: #A07A35;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(182, 141, 64, 0.25);
 }
 
 /* Cards */
@@ -133,7 +178,11 @@ body {
   background: white;
   border-radius: 0.75rem;
   border: 1px solid var(--border);
-  transition: box-shadow 0.15s ease;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 /* Sticky notes */
@@ -167,20 +216,21 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--phase-color, var(--blue));
+  background: var(--phase-color, var(--primary));
 }
 
 /* Forms */
 input[type="text"],
 input[type="email"],
 input[type="password"],
+input[type="number"],
 textarea,
 select {
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   padding: 0.625rem 0.875rem;
   font-size: 0.875rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
   width: 100%;
   background: white;
@@ -190,6 +240,24 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  border-color: var(--primary-lighter);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }

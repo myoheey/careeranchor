@@ -123,21 +123,21 @@ export default function JoinProjectModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
       <div
         ref={modalRef}
-        className="bg-white rounded-lg shadow-lg w-full max-w-sm mx-4 animate-fade-in"
+        className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 animate-scale-in"
       >
-        <div className="flex items-center justify-between p-5 border-b border-slate-100">
+        <div className="flex items-center justify-between p-5 border-b border-border-light">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">프로젝트 참여</h3>
-            <p className="text-xs text-slate-500 mt-0.5">참여 코드를 입력하세요</p>
+            <h3 className="text-base font-semibold text-text">프로젝트 참여</h3>
+            <p className="text-xs text-text-muted mt-0.5">참여 코드를 입력하세요</p>
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded text-text-muted hover:text-text hover:bg-surface-secondary transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -147,13 +147,13 @@ export default function JoinProjectModal({
 
         <div className="p-5">
           {error && (
-            <div className="mb-3 p-2.5 rounded-lg bg-red-50 border border-red-200 text-sm text-red-600">
+            <div className="mb-3 p-2.5 rounded-lg bg-red-50 border border-red-200/60 text-sm text-red-700">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSearch} className="mb-4">
-            <label htmlFor="join-code" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="join-code" className="block text-sm font-medium text-text-secondary mb-1">
               참여 코드
             </label>
             <div className="flex gap-2">
@@ -182,13 +182,13 @@ export default function JoinProjectModal({
           </form>
 
           {project && (
-            <div className="p-4 rounded-lg border border-blue-200 bg-blue-50/50 animate-fade-in">
+            <div className="p-4 rounded-lg border border-primary/15 bg-primary/5 animate-fade-in">
               <div className="flex items-center gap-3 mb-3">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-slate-900 text-sm truncate">
+                  <h4 className="font-semibold text-text text-sm truncate">
                     {project.name}
                   </h4>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-text-muted mt-0.5">
                     {themeLabel(project.theme)} &middot; {project.professorName}
                   </p>
                 </div>
@@ -204,7 +204,7 @@ export default function JoinProjectModal({
           )}
 
           {!project && !error && (
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-text-muted leading-relaxed">
               교수님이 공유한 8자리 참여 코드를 입력하세요.
             </p>
           )}

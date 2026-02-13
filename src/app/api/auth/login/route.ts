@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { setSession } from "@/lib/auth";
+import { createToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "이메일과 비밀번호를 입력해주세요." },
         { status: 400 }
       );
     }
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { error: "이메일 또는 비밀번호가 올바르지 않습니다." },
         { status: 401 }
       );
     }
@@ -30,19 +30,19 @@ export async function POST(request: Request) {
 
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { error: "이메일 또는 비밀번호가 올바르지 않습니다." },
         { status: 401 }
       );
     }
 
-    await setSession({
+    const token = await createToken({
       id: user.id,
       email: user.email,
       name: user.name,
       role: user.role as "PROFESSOR" | "STUDENT",
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
@@ -50,10 +50,22 @@ export async function POST(request: Request) {
         role: user.role,
       },
     });
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
     console.error("Login error:", error);
+    const message =
+      error instanceof Error ? error.message : "서버 오류가 발생했습니다.";
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: message },
       { status: 500 }
     );
   }

@@ -23,10 +23,10 @@ interface Project {
   };
 }
 
-const themeConfig: Record<string, { label: string; dot: string }> = {
-  STARTUP: { label: "창업", dot: "bg-red-500" },
-  JOB_CREATION: { label: "창직", dot: "bg-blue-500" },
-  PROBLEM_SOLVING: { label: "문제해결", dot: "bg-green-500" },
+const themeConfig: Record<string, { label: string; color: string; bg: string }> = {
+  STARTUP: { label: "창업", color: "text-theme-startup", bg: "bg-theme-startup" },
+  JOB_CREATION: { label: "창직", color: "text-theme-job", bg: "bg-theme-job" },
+  PROBLEM_SOLVING: { label: "문제해결", color: "text-theme-problem", bg: "bg-theme-problem" },
 };
 
 const phaseLabels = ["Phase 0: 커리어 앵커", "Phase 1: 탐색", "Phase 2: 아이디어", "Phase 3: 설계", "Phase 4: 실행"];
@@ -67,7 +67,7 @@ export default function StudentDashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <svg className="animate-spin w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+        <svg className="animate-spin w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -80,10 +80,10 @@ export default function StudentDashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">
+          <h1 className="text-xl font-bold text-text">
             안녕하세요, {userName}님
           </h1>
-          <p className="text-sm text-slate-500 mt-1">참여 중인 프로젝트를 확인하고 팀 활동을 진행하세요</p>
+          <p className="text-sm text-text-muted mt-1">참여 중인 프로젝트를 확인하고 팀 활동을 진행하세요</p>
         </div>
         <button
           onClick={() => setShowJoinModal(true)}
@@ -98,12 +98,14 @@ export default function StudentDashboardPage() {
 
       {/* Projects Grid */}
       {projects.length === 0 ? (
-        <div className="card p-8 text-center">
-          <svg className="w-10 h-10 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          <h3 className="text-sm font-semibold text-slate-900 mb-1">참여 중인 프로젝트가 없습니다</h3>
-          <p className="text-sm text-slate-500 mb-4">
+        <div className="card p-10 text-center">
+          <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-primary-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <h3 className="text-base font-semibold text-text mb-1">참여 중인 프로젝트가 없습니다</h3>
+          <p className="text-sm text-text-muted mb-5">
             교수님이 공유한 참여 코드를 입력하여 프로젝트에 참여하세요
           </p>
           <button
@@ -114,7 +116,7 @@ export default function StudentDashboardPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {projects.map((project) => {
             const theme = themeConfig[project.theme] || themeConfig.STARTUP;
             const myTeam = project.teams.find((t) =>
@@ -125,38 +127,38 @@ export default function StudentDashboardPage() {
               <Link
                 key={project.id}
                 href={`/projects/${project.id}`}
-                className="card p-5 block"
+                className="card p-5 block hover:shadow-lg hover:shadow-primary/5 transition-all duration-200"
               >
                 {/* Theme & Phase */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="flex items-center gap-1.5 text-xs text-slate-500">
-                    <span className={`w-2 h-2 rounded-full ${theme.dot}`} />
-                    {theme.label}
+                  <span className="flex items-center gap-1.5 text-xs font-medium">
+                    <span className={`w-2 h-2 rounded-full ${theme.bg}`} />
+                    <span className={theme.color}>{theme.label}</span>
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-text-muted bg-surface-secondary px-2 py-0.5 rounded-full">
                     {phaseLabels[project.currentPhase] || `Phase ${project.currentPhase}`}
                   </span>
                 </div>
 
                 {/* Title */}
-                <h3 className="text-sm font-semibold text-slate-900 mb-1">
+                <h3 className="text-base font-semibold text-text mb-1">
                   {project.title}
                 </h3>
 
                 {/* Professor */}
-                <p className="text-xs text-slate-400 mb-3">
+                <p className="text-xs text-text-muted mb-3">
                   담당 교수: {project.professor.name}
                 </p>
 
                 {/* My Team */}
                 {myTeam && (
-                  <div className="flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-2 mb-3">
-                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-2 bg-primary/5 border border-primary/10 rounded-lg px-3 py-2 mb-3">
+                    <svg className="w-3.5 h-3.5 text-primary-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span className="text-sm font-medium text-slate-900">{myTeam.name}</span>
+                    <span className="text-sm font-medium text-primary">{myTeam.name}</span>
                     {myTeam.topic && (
-                      <span className="text-xs text-slate-500 truncate">- {myTeam.topic}</span>
+                      <span className="text-xs text-text-muted truncate">- {myTeam.topic}</span>
                     )}
                   </div>
                 )}
@@ -166,8 +168,8 @@ export default function StudentDashboardPage() {
                   {[0, 1, 2, 3, 4].map((phase) => (
                     <div
                       key={phase}
-                      className={`h-1 flex-1 rounded-full ${
-                        phase <= project.currentPhase ? "bg-blue-600" : "bg-slate-200"
+                      className={`h-1.5 flex-1 rounded-full ${
+                        phase <= project.currentPhase ? "bg-primary-lighter" : "bg-border-light"
                       }`}
                     />
                   ))}

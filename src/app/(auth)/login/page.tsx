@@ -39,21 +39,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="card p-6">
-      <div className="mb-6">
-        <h1 className="text-lg font-semibold text-slate-900">로그인</h1>
-        <p className="text-sm text-slate-500 mt-1">계정에 로그인하세요</p>
+    <div>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-text">로그인</h1>
+        <p className="text-sm text-text-muted mt-2">계정에 로그인하세요</p>
       </div>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-sm">
+        <div className="mb-5 bg-red-50 border border-red-200/60 text-red-700 px-4 py-3 rounded-lg text-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium text-text-secondary mb-1.5">
             이메일
           </label>
           <input
@@ -67,11 +67,11 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+          <div className="flex items-center justify-between mb-1.5">
+            <label htmlFor="password" className="block text-sm font-medium text-text-secondary">
               비밀번호
             </label>
-            <Link href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-500">
+            <Link href="/forgot-password" className="text-xs text-primary-lighter hover:text-primary transition-colors">
               비밀번호를 잊으셨나요?
             </Link>
           </div>
@@ -88,15 +88,15 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="btn-primary w-full justify-center py-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="btn-primary w-full justify-center py-3 text-base disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? "로그인 중..." : "로그인"}
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-text-muted">
         계정이 없으신가요?{" "}
-        <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+        <Link href="/register" className="font-medium text-primary hover:text-primary-light transition-colors">
           회원가입
         </Link>
       </p>
