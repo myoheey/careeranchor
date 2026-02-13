@@ -111,10 +111,10 @@ export default function ProjectDetailPage(props: { params: Promise<{ id: string 
     if (!teamName.trim()) return;
     setCreatingTeam(true);
     try {
-      const res = await fetch(`/api/projects/${params.id}/teams`, {
+      const res = await fetch(`/api/teams`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: teamName.trim(), topic: teamTopic.trim() || null }),
+        body: JSON.stringify({ name: teamName.trim(), topic: teamTopic.trim() || null, projectId: params.id }),
       });
       if (res.ok) {
         setTeamName("");

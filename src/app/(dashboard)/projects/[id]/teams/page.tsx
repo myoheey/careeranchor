@@ -80,10 +80,10 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
     if (!teamName.trim()) return;
     setCreatingTeam(true);
     try {
-      const res = await fetch(`/api/projects/${projectId}/teams`, {
+      const res = await fetch(`/api/teams`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: teamName.trim(), topic: teamTopic.trim() || null }),
+        body: JSON.stringify({ name: teamName.trim(), topic: teamTopic.trim() || null, projectId }),
       });
       if (res.ok) {
         setTeamName("");
@@ -101,8 +101,10 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
   const joinTeam = async (teamId: string) => {
     setJoiningTeam(teamId);
     try {
-      const res = await fetch(`/api/projects/${projectId}/teams/${teamId}/join`, {
+      const res = await fetch(`/api/teams/${teamId}`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "join" }),
       });
       if (res.ok) {
         fetchData();
@@ -117,8 +119,10 @@ export default function TeamsPage(props: { params: Promise<{ id: string }> }) {
   const leaveTeam = async (teamId: string) => {
     setLeavingTeam(teamId);
     try {
-      const res = await fetch(`/api/projects/${projectId}/teams/${teamId}/leave`, {
+      const res = await fetch(`/api/teams/${teamId}`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "leave" }),
       });
       if (res.ok) {
         fetchData();

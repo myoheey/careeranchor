@@ -215,9 +215,9 @@ export async function POST(
     const body = await request.json();
     const { action } = body;
 
-    if (action !== "join") {
+    if (action !== "join" && action !== "leave") {
       return NextResponse.json(
-        { error: "Invalid action. Supported actions: join" },
+        { error: "Invalid action. Supported actions: join, leave" },
         { status: 400 }
       );
     }
@@ -239,6 +239,26 @@ export async function POST(
       );
     }
 
+    if (action === "leave") {
+      const member = team.members.find(
+        (m: { userId: string }) => m.userId === session.id
+      );
+
+      if (!member) {
+        return NextResponse.json(
+          { error: "You are not a member of this team" },
+          { status: 400 }
+        );
+      }
+
+      await prisma.teamMember.delete({
+        where: { id: member.id },
+      });
+
+      return NextResponse.json({ message: "Successfully left the team" });
+    }
+
+    // action === "join"
     // Check if user is already a member of this team
     const existingMember = team.members.find(
       (member: { userId: string }) => member.userId === session.id
