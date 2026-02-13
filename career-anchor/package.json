@@ -16,8 +16,7 @@
     "react-dom": "^19.0.0",
     "@prisma/client": "^6.2.0",
     "bcryptjs": "^2.4.3",
-    "jose": "^6.0.0",
-    "openai": "^4.77.0"
+    "jose": "^6.0.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

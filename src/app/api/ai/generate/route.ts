@@ -13,7 +13,10 @@ interface InfographicResponse {
   summary: string;
 }
 
-async function generateWithOpenAI(
+const GEMINI_MODEL = "gemini-3-flash-preview";
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+async function generateWithGemini(
   notes: { content: string; author: { name: string } }[],
   templateTitle: string
 ): Promise<InfographicResponse> {
@@ -21,39 +24,37 @@ async function generateWithOpenAI(
     .map((n, i) => `${i + 1}. ${n.content} (by ${n.author.name})`)
     .join("\n");
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const prompt = `You are a helpful assistant that summarizes brainstorming sticky notes into structured infographic content. Always respond with valid JSON matching this schema: { title: string, sections: [{heading: string, points: string[]}], summary: string }
+
+Summarize the following sticky notes from the template "${templateTitle}" into infographic content. Group related ideas into sections with clear headings and key points.
+
+Sticky Notes:
+${notesText}
+
+Respond with a JSON object containing: title, sections (array of {heading, points}), and summary.`;
+
+  const response = await fetch(`${GEMINI_API_URL}?key=${process.env.GEMINI_API_KEY}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful assistant that summarizes brainstorming sticky notes into structured infographic content. Always respond with valid JSON matching this schema: { title: string, sections: [{heading: string, points: string[]}], summary: string }",
-        },
-        {
-          role: "user",
-          content: `Summarize the following sticky notes from the template "${templateTitle}" into infographic content. Group related ideas into sections with clear headings and key points.\n\nSticky Notes:\n${notesText}\n\nRespond with a JSON object containing: title, sections (array of {heading, points}), and summary.`,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 1000,
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1000,
+        responseMimeType: "application/json",
+      },
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.statusText}`);
+    throw new Error(`Gemini API error: ${response.statusText}`);
   }
 
   const data = await response.json();
-  const content = data.choices[0]?.message?.content;
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!content) {
-    throw new Error("No content returned from OpenAI");
+    throw new Error("No content returned from Gemini");
   }
 
   // Parse the JSON from the response (handle markdown code blocks)
@@ -192,19 +193,18 @@ export async function POST(request: Request) {
 
     let infographic: InfographicResponse;
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     const isApiKeyValid =
       apiKey &&
       apiKey.trim() !== "" &&
-      apiKey !== "your-openai-api-key" &&
-      apiKey !== "sk-placeholder" &&
+      apiKey !== "your-gemini-api-key" &&
       !apiKey.startsWith("placeholder");
 
     if (isApiKeyValid) {
       try {
-        infographic = await generateWithOpenAI(notes, template.title);
+        infographic = await generateWithGemini(notes, template.title);
       } catch (error) {
-        console.error("OpenAI generation failed, falling back to local:", error);
+        console.error("Gemini generation failed, falling back to local:", error);
         infographic = generateLocally(notes, template.title);
       }
     } else {

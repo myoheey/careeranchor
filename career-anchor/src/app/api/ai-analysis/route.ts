@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import OpenAI from "openai";
 import {
   careerAnchorCategories,
   anchorDescriptions,
   anchorFullNames,
 } from "@/lib/career-anchor-data";
+
+const GEMINI_MODEL = "gemini-3-flash-preview";
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 export async function POST(request: Request) {
   try {
@@ -88,7 +90,7 @@ ${bottom3Summary}
 ---
 리포트는 전문적이면서도 따뜻한 톤으로 작성하고, 구체적인 예시와 실용적인 조언을 포함해주세요.`;
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
         { error: "AI 서비스가 설정되지 않았습니다. 관리자에게 문의하세요." },
@@ -96,16 +98,31 @@ ${bottom3Summary}
       );
     }
 
-    const openai = new OpenAI({ apiKey });
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: 3000,
+    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 3000,
+        },
+      }),
     });
 
-    const report = completion.choices[0]?.message?.content || "리포트 생성에 실패했습니다.";
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Gemini API error:", response.status, errorData);
+      return NextResponse.json(
+        { error: "AI 분석 중 오류가 발생했습니다." },
+        { status: 500 }
+      );
+    }
+
+    const data = await response.json();
+    const report =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "리포트 생성에 실패했습니다.";
 
     // Save the report to DB
     await prisma.careerAnchorResult.update({
