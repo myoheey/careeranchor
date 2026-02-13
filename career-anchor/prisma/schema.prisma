@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+
+  results CareerAnchorResult[]
+}
+
+model CareerAnchorResult {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scores     Json     // { TF: 4.2, GM: 3.8, ... }
+  topAnchor  String
+  aiReport   String?  @db.Text // AI-generated report
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
