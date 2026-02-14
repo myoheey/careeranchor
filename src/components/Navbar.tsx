@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 
 interface User {
   name: string;
-  role: string;
 }
 
 interface NavbarProps {
@@ -75,9 +74,6 @@ export default function Navbar({ user: userProp }: NavbarProps) {
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">{user.name.charAt(0)}</div>
                   <span className="text-sm text-text-secondary font-medium">{user.name}</span>
-                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${user.role === "PROFESSOR" ? "bg-primary/10 text-primary-light" : "bg-accent/10 text-accent"}`}>
-                    {user.role === "PROFESSOR" ? "교수" : "학생"}
-                  </span>
                 </div>
                 <div className="w-px h-4 bg-border" />
                 <button onClick={handleLogout} disabled={loggingOut} className="text-xs text-text-muted hover:text-red-600 transition-colors disabled:opacity-50">로그아웃</button>
@@ -103,9 +99,6 @@ export default function Navbar({ user: userProp }: NavbarProps) {
             <div className="flex items-center gap-2 pb-3 border-b border-border-light">
               <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">{user.name.charAt(0)}</div>
               <span className="text-sm text-text-secondary font-medium">{user.name}</span>
-              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${user.role === "PROFESSOR" ? "bg-primary/10 text-primary-light" : "bg-accent/10 text-accent"}`}>
-                {user.role === "PROFESSOR" ? "교수" : "학생"}
-              </span>
             </div>
             <Link href="/dashboard" className="block text-sm text-text-secondary hover:text-primary py-1" onClick={() => setMobileMenuOpen(false)}>대시보드</Link>
             <button onClick={handleLogout} disabled={loggingOut} className="text-sm text-red-500 hover:text-red-600 disabled:opacity-50">
