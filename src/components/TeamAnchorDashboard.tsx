@@ -11,7 +11,7 @@ interface MemberResult {
 }
 
 interface TeamAnchorDashboardProps {
-  projectId: string;
+  groupId: string;
 }
 
 const ANCHOR_LABELS: Record<string, string> = {
@@ -25,14 +25,14 @@ const ANCHOR_LABELS: Record<string, string> = {
   LS: "라이프스타일",
 };
 
-export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardProps) {
+export default function TeamAnchorDashboard({ groupId }: TeamAnchorDashboardProps) {
   const [memberResults, setMemberResults] = useState<MemberResult[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchResults() {
       try {
-        const res = await fetch(`/api/career-anchor?projectId=${projectId}`);
+        const res = await fetch(`/api/career-anchor?groupId=${groupId}`);
         if (res.ok) {
           const data = await res.json();
           setMemberResults(data.results);
@@ -44,9 +44,8 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
       }
     }
     fetchResults();
-  }, [projectId]);
+  }, [groupId]);
 
-  // Team average scores
   const teamAverage = useMemo(() => {
     if (memberResults.length === 0) return null;
     const avg: Record<string, number> = {};
@@ -57,15 +56,12 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
     return avg;
   }, [memberResults]);
 
-  // Strengths and weaknesses
   const insights = useMemo(() => {
     if (!teamAverage) return null;
     const sorted = [...careerAnchorCategories].sort(
       (a, b) => (teamAverage[b.key] || 0) - (teamAverage[a.key] || 0)
     );
-    const strengths = sorted.slice(0, 2);
-    const weaknesses = sorted.slice(-2).reverse();
-    return { strengths, weaknesses };
+    return { strengths: sorted.slice(0, 2), weaknesses: sorted.slice(-2).reverse() };
   }, [teamAverage]);
 
   const maxScore = 6;
@@ -89,45 +85,23 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
-        <h3 className="text-base font-semibold text-slate-900 mb-2">
-          아직 검사 결과가 없습니다
-        </h3>
-        <p className="text-sm text-slate-500">
-          팀원들이 커리어 앵커 검사를 완료하면 여기에 결과가 표시됩니다.
-        </p>
+        <h3 className="text-base font-semibold text-slate-900 mb-2">아직 검사 결과가 없습니다</h3>
+        <p className="text-sm text-slate-500">학생들이 커리어 앵커 검사를 완료하면 여기에 결과가 표시됩니다.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Team Balance Analysis */}
       {teamAverage && insights && (
         <div className="bg-white rounded-lg border border-slate-200 p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-1">
-            팀 밸런스 분석
-          </h3>
-          <p className="text-sm text-slate-500 mb-6">
-            팀 전체의 커리어 앵커 평균 점수
-          </p>
-
-          {/* Team radar chart */}
+          <h3 className="text-lg font-semibold text-slate-900 mb-1">그룹 밸런스 분석</h3>
+          <p className="text-sm text-slate-500 mb-6">그룹 전체의 커리어 앵커 평균 점수</p>
           <div className="flex justify-center mb-6">
             <div className="relative w-72 h-72">
-              {/* Background rings */}
               {[1, 2, 3, 4, 5, 6].map((ring) => (
-                <div
-                  key={ring}
-                  className="absolute rounded-full border border-slate-200"
-                  style={{
-                    width: `${(ring / 6) * 100}%`,
-                    height: `${(ring / 6) * 100}%`,
-                    left: `${50 - (ring / 6) * 50}%`,
-                    top: `${50 - (ring / 6) * 50}%`,
-                  }}
-                />
+                <div key={ring} className="absolute rounded-full border border-slate-200" style={{ width: `${(ring / 6) * 100}%`, height: `${(ring / 6) * 100}%`, left: `${50 - (ring / 6) * 50}%`, top: `${50 - (ring / 6) * 50}%` }} />
               ))}
-              {/* Data points and labels */}
               {careerAnchorCategories.map((cat, i) => {
                 const score = teamAverage[cat.key] || 0;
                 const angle = (i / careerAnchorCategories.length) * 2 * Math.PI - Math.PI / 2;
@@ -137,225 +111,96 @@ export default function TeamAnchorDashboard({ projectId }: TeamAnchorDashboardPr
                 const y = 50 + radius * Math.sin(angle);
                 const labelX = 50 + labelRadius * Math.cos(angle);
                 const labelY = 50 + labelRadius * Math.sin(angle);
-
                 return (
                   <div key={cat.key}>
-                    <div
-                      className="absolute w-3 h-3 rounded-full border-2 border-white shadow-sm z-10"
-                      style={{
-                        backgroundColor: cat.color,
-                        left: `${x}%`,
-                        top: `${y}%`,
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    />
-                    <div
-                      className="absolute text-[9px] font-medium text-slate-500 whitespace-nowrap"
-                      style={{
-                        left: `${labelX}%`,
-                        top: `${labelY}%`,
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    >
-                      {cat.name}
-                    </div>
-                    <svg
-                      className="absolute inset-0 w-full h-full pointer-events-none"
-                      viewBox="0 0 100 100"
-                    >
-                      <line
-                        x1="50"
-                        y1="50"
-                        x2={x}
-                        y2={y}
-                        stroke={cat.color}
-                        strokeWidth="1.5"
-                        opacity="0.3"
-                      />
+                    <div className="absolute w-3 h-3 rounded-full border-2 border-white shadow-sm z-10" style={{ backgroundColor: cat.color, left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)" }} />
+                    <div className="absolute text-[9px] font-medium text-slate-500 whitespace-nowrap" style={{ left: `${labelX}%`, top: `${labelY}%`, transform: "translate(-50%, -50%)" }}>{cat.name}</div>
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+                      <line x1="50" y1="50" x2={x} y2={y} stroke={cat.color} strokeWidth="1.5" opacity="0.3" />
                     </svg>
                   </div>
                 );
               })}
-              <svg
-                className="absolute inset-0 w-full h-full pointer-events-none"
-                viewBox="0 0 100 100"
-              >
-                <polygon
-                  points={careerAnchorCategories
-                    .map((cat, i) => {
-                      const score = teamAverage[cat.key] || 0;
-                      const angle =
-                        (i / careerAnchorCategories.length) * 2 * Math.PI - Math.PI / 2;
-                      const radius = (score / maxScore) * 48;
-                      const x = 50 + radius * Math.cos(angle);
-                      const y = 50 + radius * Math.sin(angle);
-                      return `${x},${y}`;
-                    })
-                    .join(" ")}
-                  fill="rgba(16, 185, 129, 0.15)"
-                  stroke="rgba(16, 185, 129, 0.6)"
-                  strokeWidth="1.5"
-                />
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+                <polygon points={careerAnchorCategories.map((cat, i) => { const score = teamAverage[cat.key] || 0; const angle = (i / careerAnchorCategories.length) * 2 * Math.PI - Math.PI / 2; const radius = (score / maxScore) * 48; return `${50 + radius * Math.cos(angle)},${50 + radius * Math.sin(angle)}`; }).join(" ")} fill="rgba(16, 185, 129, 0.15)" stroke="rgba(16, 185, 129, 0.6)" strokeWidth="1.5" />
               </svg>
             </div>
           </div>
-
-          {/* Team average bar chart */}
           <div className="mb-6">
             <div className="flex flex-col gap-2">
-              {[...careerAnchorCategories]
-                .sort((a, b) => (teamAverage[b.key] || 0) - (teamAverage[a.key] || 0))
-                .map((cat) => {
-                  const score = teamAverage[cat.key] || 0;
-                  const percentage = (score / maxScore) * 100;
-                  return (
-                    <div key={cat.key} className="flex items-center gap-3">
-                      <div className="w-24 text-right">
-                        <span className="text-xs font-medium text-slate-900">
-                          {cat.name}
-                        </span>
-                      </div>
-                      <div className="flex-1 h-6 bg-slate-100 rounded-md overflow-hidden">
-                        <div
-                          className="h-full rounded-md transition-all duration-700 ease-out flex items-center justify-end pr-2"
-                          style={{
-                            width: `${Math.max(percentage, 5)}%`,
-                            backgroundColor: cat.color,
-                          }}
-                        >
-                          <span className="text-[10px] font-semibold text-white">
-                            {score.toFixed(1)}
-                          </span>
-                        </div>
+              {[...careerAnchorCategories].sort((a, b) => (teamAverage[b.key] || 0) - (teamAverage[a.key] || 0)).map((cat) => {
+                const score = teamAverage[cat.key] || 0;
+                const percentage = (score / maxScore) * 100;
+                return (
+                  <div key={cat.key} className="flex items-center gap-3">
+                    <div className="w-24 text-right"><span className="text-xs font-medium text-slate-900">{cat.name}</span></div>
+                    <div className="flex-1 h-6 bg-slate-100 rounded-md overflow-hidden">
+                      <div className="h-full rounded-md transition-all duration-700 ease-out flex items-center justify-end pr-2" style={{ width: `${Math.max(percentage, 5)}%`, backgroundColor: cat.color }}>
+                        <span className="text-[10px] font-semibold text-white">{score.toFixed(1)}</span>
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                );
+              })}
             </div>
           </div>
-
-          {/* Insights */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-100">
-              <h4 className="text-sm font-semibold text-emerald-800 mb-2">
-                팀 강점
-              </h4>
+              <h4 className="text-sm font-semibold text-emerald-800 mb-2">그룹 강점</h4>
               {insights.strengths.map((cat) => (
                 <div key={cat.key} className="flex items-center gap-2 mb-1.5">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: cat.color }}
-                  />
-                  <span className="text-sm text-emerald-700 font-medium">
-                    {cat.name}
-                  </span>
-                  <span className="text-xs text-emerald-500">
-                    {(teamAverage[cat.key] || 0).toFixed(1)}점
-                  </span>
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
+                  <span className="text-sm text-emerald-700 font-medium">{cat.name}</span>
+                  <span className="text-xs text-emerald-500">{(teamAverage[cat.key] || 0).toFixed(1)}점</span>
                 </div>
               ))}
-              <p className="text-xs text-emerald-600 mt-2">
-                팀이 이 영역에서 높은 역량을 보입니다.
-              </p>
+              <p className="text-xs text-emerald-600 mt-2">그룹이 이 영역에서 높은 역량을 보입니다.</p>
             </div>
-
             <div className="p-4 rounded-lg bg-amber-50 border border-amber-100">
-              <h4 className="text-sm font-semibold text-amber-800 mb-2">
-                보완 필요
-              </h4>
+              <h4 className="text-sm font-semibold text-amber-800 mb-2">보완 필요</h4>
               {insights.weaknesses.map((cat) => (
                 <div key={cat.key} className="flex items-center gap-2 mb-1.5">
-                  <div
-                    className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: cat.color }}
-                  />
-                  <span className="text-sm text-amber-700 font-medium">
-                    {cat.name}
-                  </span>
-                  <span className="text-xs text-amber-500">
-                    {(teamAverage[cat.key] || 0).toFixed(1)}점
-                  </span>
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
+                  <span className="text-sm text-amber-700 font-medium">{cat.name}</span>
+                  <span className="text-xs text-amber-500">{(teamAverage[cat.key] || 0).toFixed(1)}점</span>
                 </div>
               ))}
-              <p className="text-xs text-amber-600 mt-2">
-                이 영역에 관심을 가지면 팀 역량이 균형잡힙니다.
-              </p>
+              <p className="text-xs text-amber-600 mt-2">이 영역에 관심을 가지면 그룹 역량이 균형잡힙니다.</p>
             </div>
           </div>
         </div>
       )}
-
-      {/* Team Member Results */}
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <h3 className="text-lg font-semibold text-slate-900 mb-1">
-          팀원 검사 결과
-        </h3>
-        <p className="text-sm text-slate-500 mb-4">
-          {memberResults.length}명이 검사를 완료했습니다.
-        </p>
-
+        <h3 className="text-lg font-semibold text-slate-900 mb-1">구성원 검사 결과</h3>
+        <p className="text-sm text-slate-500 mb-4">{memberResults.length}명이 검사를 완료했습니다.</p>
         <div className="space-y-3">
           {memberResults.map((member) => {
             const topCat = careerAnchorCategories.find((c) => c.key === member.topAnchor);
-            const sorted = [...careerAnchorCategories].sort(
-              (a, b) => (member.results[b.key] || 0) - (member.results[a.key] || 0)
-            );
+            const sorted = [...careerAnchorCategories].sort((a, b) => (member.results[b.key] || 0) - (member.results[a.key] || 0));
             const top3 = sorted.slice(0, 3);
-
             return (
-              <div
-                key={member.userId}
-                className="p-4 rounded-lg border border-slate-200"
-              >
+              <div key={member.userId} className="p-4 rounded-lg border border-slate-200">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center text-white font-semibold text-sm">
-                      {member.userName.charAt(0)}
-                    </div>
+                    <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center text-white font-semibold text-sm">{member.userName.charAt(0)}</div>
                     <div>
-                      <p className="font-semibold text-slate-900 text-sm">
-                        {member.userName}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        {ANCHOR_LABELS[member.topAnchor] || member.topAnchor} 유형
-                      </p>
+                      <p className="font-semibold text-slate-900 text-sm">{member.userName}</p>
+                      <p className="text-xs text-slate-400">{ANCHOR_LABELS[member.topAnchor] || member.topAnchor} 유형</p>
                     </div>
                   </div>
-                  {topCat && (
-                    <span
-                      className="text-xs font-semibold px-3 py-1 rounded-lg text-white"
-                      style={{ backgroundColor: topCat.color }}
-                    >
-                      {topCat.name}
-                    </span>
-                  )}
+                  {topCat && <span className="text-xs font-semibold px-3 py-1 rounded-lg text-white" style={{ backgroundColor: topCat.color }}>{topCat.name}</span>}
                 </div>
-
-                {/* Mini bar chart for top 3 */}
                 <div className="flex flex-col gap-1.5">
                   {top3.map((cat) => {
                     const score = member.results[cat.key] || 0;
                     const percentage = (score / maxScore) * 100;
                     return (
                       <div key={cat.key} className="flex items-center gap-2">
-                        <div className="w-16 text-right">
-                          <span className="text-[10px] text-slate-500">
-                            {cat.name}
-                          </span>
-                        </div>
+                        <div className="w-16 text-right"><span className="text-[10px] text-slate-500">{cat.name}</span></div>
                         <div className="flex-1 h-4 bg-slate-100 rounded-md overflow-hidden">
-                          <div
-                            className="h-full rounded-md transition-all duration-500"
-                            style={{
-                              width: `${Math.max(percentage, 5)}%`,
-                              backgroundColor: cat.color,
-                              opacity: 0.8,
-                            }}
-                          />
+                          <div className="h-full rounded-md transition-all duration-500" style={{ width: `${Math.max(percentage, 5)}%`, backgroundColor: cat.color, opacity: 0.8 }} />
                         </div>
-                        <span className="text-[10px] font-medium text-slate-500 w-8">
-                          {score.toFixed(1)}
-                        </span>
+                        <span className="text-[10px] font-medium text-slate-500 w-8">{score.toFixed(1)}</span>
                       </div>
                     );
                   })}

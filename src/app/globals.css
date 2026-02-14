@@ -26,11 +26,6 @@
   --color-text-secondary: #4A5043;
   --color-text-muted: #8C8C82;
 
-  /* Theme colors */
-  --color-theme-startup: #C05746;
-  --color-theme-job: #3B7DD8;
-  --color-theme-problem: #2D6A4F;
-
   /* Fonts */
   --font-sans: "Pretendard", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
@@ -164,40 +159,6 @@ body {
 
 .card:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-}
-
-/* Sticky notes */
-.sticky-note {
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.sticky-note:hover {
-  transform: scale(1.02);
-  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.sticky-note.dragging {
-  transform: scale(1.05) rotate(2deg);
-  box-shadow: 8px 8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-}
-
-/* Phase card */
-.phase-card {
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.phase-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--phase-color, var(--color-primary));
 }
 
 /* Forms */

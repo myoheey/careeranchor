@@ -16,81 +16,49 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projects            Project[]            @relation("ProjectOwner")
-  teamMembers         TeamMember[]
-  stickyNotes         StickyNote[]
-  careerAnchorResults CareerAnchorResult[] @relation("CareerAnchorResults")
+  groups              AssessmentGroup[]
+  groupMemberships    GroupMember[]
+  careerAnchorResults CareerAnchorResult[]
   passwordResetTokens PasswordResetToken[]
 }
 
-model Project {
-  id           String   @id @default(uuid())
-  title        String
-  description  String?
-  theme        String   // STARTUP, JOB_CREATION, PROBLEM_SOLVING
-  joinCode     String   @unique
-  professorId  String
-  professor    User     @relation("ProjectOwner", fields: [professorId], references: [id])
-  currentPhase Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  teams              Team[]
-  templates          Template[]
-  careerAnchorResults CareerAnchorResult[]
-}
-
-model Team {
-  id        String   @id @default(uuid())
-  name      String
-  topic     String?
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  members     TeamMember[]
-  stickyNotes StickyNote[]
-}
-
-model TeamMember {
-  id       String   @id @default(uuid())
-  userId   String
-  teamId   String
-  user     User     @relation(fields: [userId], references: [id])
-  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  joinedAt DateTime @default(now())
-
-  @@unique([userId, teamId])
-}
-
-model Template {
+model AssessmentGroup {
   id          String   @id @default(uuid())
   title       String
   description String?
-  phase       Int
-  theme       String?  // null means common template
-  projectId   String?
-  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  isDefault   Boolean  @default(false)
-  createdBy   String?
-  content     String?  // JSON layout config
+  joinCode    String   @unique
+  professorId String
+  professor   User     @relation(fields: [professorId], references: [id])
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  stickyNotes StickyNote[]
+  members             GroupMember[]
+  careerAnchorResults CareerAnchorResult[]
+}
+
+model GroupMember {
+  id       String   @id @default(uuid())
+  userId   String
+  groupId  String
+  user     User     @relation(fields: [userId], references: [id])
+  group    AssessmentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, groupId])
 }
 
 model CareerAnchorResult {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation("CareerAnchorResults", fields: [userId], references: [id])
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+  groupId   String
+  group     AssessmentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
   results   String   // JSON: { TF: 4.2, GM: 3.8, ... }
   topAnchor String   // e.g. "TF"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, projectId])
+  @@unique([userId, groupId])
 }
 
 model PasswordResetToken {
@@ -101,22 +69,4 @@ model PasswordResetToken {
   expiresAt DateTime
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
-}
-
-model StickyNote {
-  id         String   @id @default(uuid())
-  content    String
-  color      String   @default("#FEF3C7")
-  posX       Float
-  posY       Float
-  width      Float    @default(200)
-  height     Float    @default(150)
-  templateId String
-  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  teamId     String?
-  team       Team?    @relation(fields: [teamId], references: [id])
-  authorId   String
-  author     User     @relation(fields: [authorId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 }

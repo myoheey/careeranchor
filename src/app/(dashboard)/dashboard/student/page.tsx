@@ -1,68 +1,50 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import JoinProjectModal from "@/components/JoinProjectModal";
+import CareerAnchorSurvey from "@/components/CareerAnchorSurvey";
+import JoinGroupModal from "@/components/JoinGroupModal";
 
-interface Team {
-  id: string;
-  name: string;
-  topic: string | null;
-  members: { userId: string }[];
-}
-
-interface Project {
+interface Group {
   id: string;
   title: string;
   description: string | null;
-  theme: string;
-  currentPhase: number;
-  teams: Team[];
-  professor: {
-    name: string;
+  professorName?: string;
+  professor?: { name: string };
+  _count: {
+    members: number;
+    careerAnchorResults: number;
   };
 }
 
-const themeConfig: Record<string, { label: string; color: string; bg: string }> = {
-  STARTUP: { label: "창업", color: "text-theme-startup", bg: "bg-theme-startup" },
-  JOB_CREATION: { label: "창직", color: "text-theme-job", bg: "bg-theme-job" },
-  PROBLEM_SOLVING: { label: "문제해결", color: "text-theme-problem", bg: "bg-theme-problem" },
-};
-
-const phaseLabels = ["Phase 0: 커리어 앵커", "Phase 1: 탐색", "Phase 2: 아이디어", "Phase 3: 설계", "Phase 4: 실행"];
-
 export default function StudentDashboardPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("");
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [activeGroup, setActiveGroup] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const [projectsRes, meRes] = await Promise.all([
-        fetch("/api/projects"),
+      const [groupsRes, meRes] = await Promise.all([
+        fetch("/api/groups"),
         fetch("/api/auth/me"),
       ]);
-
-      if (projectsRes.ok) {
-        const data = await projectsRes.json();
-        setProjects(data.projects);
+      if (groupsRes.ok) {
+        const data = await groupsRes.json();
+        setGroups(data.groups);
       }
-
       if (meRes.ok) {
         const data = await meRes.json();
         setUserName(data.user.name);
       }
     } catch {
-      // error fetching
+      // error
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   if (loading) {
     return (
@@ -75,119 +57,78 @@ export default function StudentDashboardPage() {
     );
   }
 
+  if (activeGroup) {
+    const group = groups.find((g) => g.id === activeGroup);
+    return (
+      <div>
+        <button onClick={() => setActiveGroup(null)} className="flex items-center gap-2 text-sm text-text-muted hover:text-primary mb-6 transition-colors">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          대시보드로 돌아가기
+        </button>
+        <h2 className="text-lg font-bold text-text mb-6">{group?.title} - 커리어 앵커 검사</h2>
+        <CareerAnchorSurvey groupId={activeGroup} onComplete={() => fetchData()} />
+      </div>
+    );
+  }
+
   return (
     <div>
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-xl font-bold text-text">
-            안녕하세요, {userName}님
-          </h1>
-          <p className="text-sm text-text-muted mt-1">참여 중인 프로젝트를 확인하고 팀 활동을 진행하세요</p>
+          <h1 className="text-xl font-bold text-text">안녕하세요, {userName}님</h1>
+          <p className="text-sm text-text-muted mt-1">참여 중인 그룹에서 커리어 앵커 검사를 진행하세요</p>
         </div>
-        <button
-          onClick={() => setShowJoinModal(true)}
-          className="btn-primary text-sm"
-        >
+        <button onClick={() => setShowJoinModal(true)} className="btn-primary text-sm">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
           </svg>
-          프로젝트 참여
+          그룹 참여
         </button>
       </div>
 
-      {/* Projects Grid */}
-      {projects.length === 0 ? (
+      {groups.length === 0 ? (
         <div className="card p-10 text-center">
           <div className="w-14 h-14 rounded-full bg-primary/5 flex items-center justify-center mx-auto mb-4">
             <svg className="w-7 h-7 text-primary-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-text mb-1">참여 중인 프로젝트가 없습니다</h3>
-          <p className="text-sm text-text-muted mb-5">
-            교수님이 공유한 참여 코드를 입력하여 프로젝트에 참여하세요
-          </p>
-          <button
-            onClick={() => setShowJoinModal(true)}
-            className="btn-primary text-sm"
-          >
-            프로젝트 참여하기
-          </button>
+          <h3 className="text-base font-semibold text-text mb-1">참여 중인 그룹이 없습니다</h3>
+          <p className="text-sm text-text-muted mb-5">교수님이 공유한 참여 코드를 입력하여 그룹에 참여하세요</p>
+          <button onClick={() => setShowJoinModal(true)} className="btn-primary text-sm">그룹 참여하기</button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {projects.map((project) => {
-            const theme = themeConfig[project.theme] || themeConfig.STARTUP;
-            const myTeam = project.teams.find((t) =>
-              t.members.some((m) => m.userId)
-            );
-
+          {groups.map((group) => {
+            const profName = group.professorName || group.professor?.name || "";
             return (
-              <Link
-                key={project.id}
-                href={`/projects/${project.id}`}
-                className="card p-5 block hover:shadow-lg hover:shadow-primary/5 transition-all duration-200"
+              <div
+                key={group.id}
+                onClick={() => setActiveGroup(group.id)}
+                className="card p-5 cursor-pointer hover:shadow-lg hover:shadow-primary/5 transition-all duration-200"
               >
-                {/* Theme & Phase */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="flex items-center gap-1.5 text-xs font-medium">
-                    <span className={`w-2 h-2 rounded-full ${theme.bg}`} />
-                    <span className={theme.color}>{theme.label}</span>
-                  </span>
-                  <span className="text-xs text-text-muted bg-surface-secondary px-2 py-0.5 rounded-full">
-                    {phaseLabels[project.currentPhase] || `Phase ${project.currentPhase}`}
-                  </span>
+                <h3 className="text-base font-semibold text-text mb-1">{group.title}</h3>
+                {group.description && <p className="text-sm text-text-muted mb-2 line-clamp-2">{group.description}</p>}
+                {profName && <p className="text-xs text-text-muted mb-3">담당: {profName}</p>}
+                <div className="flex items-center gap-4 text-xs text-text-muted">
+                  <span>{group._count.members}명 참여</span>
+                  <span>{group._count.careerAnchorResults}명 검사완료</span>
                 </div>
-
-                {/* Title */}
-                <h3 className="text-base font-semibold text-text mb-1">
-                  {project.title}
-                </h3>
-
-                {/* Professor */}
-                <p className="text-xs text-text-muted mb-3">
-                  담당 교수: {project.professor.name}
-                </p>
-
-                {/* My Team */}
-                {myTeam && (
-                  <div className="flex items-center gap-2 bg-primary/5 border border-primary/10 rounded-lg px-3 py-2 mb-3">
-                    <svg className="w-3.5 h-3.5 text-primary-lighter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="text-sm font-medium text-primary">{myTeam.name}</span>
-                    {myTeam.topic && (
-                      <span className="text-xs text-text-muted truncate">- {myTeam.topic}</span>
-                    )}
-                  </div>
-                )}
-
-                {/* Phase Progress */}
-                <div className="mt-3 flex gap-1">
-                  {[0, 1, 2, 3, 4].map((phase) => (
-                    <div
-                      key={phase}
-                      className={`h-1.5 flex-1 rounded-full ${
-                        phase <= project.currentPhase ? "bg-primary-lighter" : "bg-border-light"
-                      }`}
-                    />
-                  ))}
+                <div className="mt-4">
+                  <span className="btn-primary text-xs py-2 px-4">검사 시작 / 결과 보기</span>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* Join Project Modal */}
       {showJoinModal && (
-        <JoinProjectModal
+        <JoinGroupModal
           onClose={() => setShowJoinModal(false)}
-          onJoined={() => {
-            setShowJoinModal(false);
-            fetchData();
-          }}
+          onJoined={() => { setShowJoinModal(false); fetchData(); }}
         />
       )}
     </div>

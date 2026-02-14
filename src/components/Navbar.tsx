@@ -34,9 +34,7 @@ export default function Navbar({ user: userProp }: NavbarProps) {
           const data = await res.json();
           setUser(data.user);
         }
-      } catch {
-        // not logged in
-      }
+      } catch { /* not logged in */ }
     };
     fetchUser();
     return () => { cancelled = true; };
@@ -68,46 +66,26 @@ export default function Navbar({ user: userProp }: NavbarProps) {
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex items-center justify-between h-14">
           <Link href="/dashboard" className="text-base font-bold text-primary tracking-tight">
-            Entre<span className="text-primary-lighter">LMS</span>
+            Career<span className="text-primary-lighter">Anchor</span>
           </Link>
-
           {user && (
             <div className="hidden md:flex items-center gap-6">
-              <Link href="/dashboard" className="text-sm text-text-muted hover:text-primary transition-colors">
-                대시보드
-              </Link>
+              <Link href="/dashboard" className="text-sm text-text-muted hover:text-primary transition-colors">대시보드</Link>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">
-                    {user.name.charAt(0)}
-                  </div>
+                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">{user.name.charAt(0)}</div>
                   <span className="text-sm text-text-secondary font-medium">{user.name}</span>
-                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
-                    user.role === "PROFESSOR"
-                      ? "bg-primary/10 text-primary-light"
-                      : "bg-accent/10 text-accent"
-                  }`}>
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${user.role === "PROFESSOR" ? "bg-primary/10 text-primary-light" : "bg-accent/10 text-accent"}`}>
                     {user.role === "PROFESSOR" ? "교수" : "학생"}
                   </span>
                 </div>
                 <div className="w-px h-4 bg-border" />
-                <button
-                  onClick={handleLogout}
-                  disabled={loggingOut}
-                  className="text-xs text-text-muted hover:text-red-600 transition-colors disabled:opacity-50"
-                >
-                  로그아웃
-                </button>
+                <button onClick={handleLogout} disabled={loggingOut} className="text-xs text-text-muted hover:text-red-600 transition-colors disabled:opacity-50">로그아웃</button>
               </div>
             </div>
           )}
-
           {user && (
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-1.5 rounded text-text-muted hover:text-primary transition-colors"
-              aria-label="Toggle menu"
-            >
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-1.5 rounded text-text-muted hover:text-primary transition-colors" aria-label="Toggle menu">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileMenuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -119,26 +97,17 @@ export default function Navbar({ user: userProp }: NavbarProps) {
           )}
         </div>
       </div>
-
       {user && mobileMenuOpen && (
         <div ref={menuRef} className="md:hidden border-t border-border bg-white animate-fade-in">
           <div className="px-6 py-4 space-y-3">
             <div className="flex items-center gap-2 pb-3 border-b border-border-light">
-              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">
-                {user.name.charAt(0)}
-              </div>
+              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">{user.name.charAt(0)}</div>
               <span className="text-sm text-text-secondary font-medium">{user.name}</span>
-              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
-                user.role === "PROFESSOR"
-                  ? "bg-primary/10 text-primary-light"
-                  : "bg-accent/10 text-accent"
-              }`}>
+              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${user.role === "PROFESSOR" ? "bg-primary/10 text-primary-light" : "bg-accent/10 text-accent"}`}>
                 {user.role === "PROFESSOR" ? "교수" : "학생"}
               </span>
             </div>
-            <Link href="/dashboard" className="block text-sm text-text-secondary hover:text-primary py-1" onClick={() => setMobileMenuOpen(false)}>
-              대시보드
-            </Link>
+            <Link href="/dashboard" className="block text-sm text-text-secondary hover:text-primary py-1" onClick={() => setMobileMenuOpen(false)}>대시보드</Link>
             <button onClick={handleLogout} disabled={loggingOut} className="text-sm text-red-500 hover:text-red-600 disabled:opacity-50">
               {loggingOut ? "로그아웃 중..." : "로그아웃"}
             </button>

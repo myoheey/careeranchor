@@ -11,35 +11,34 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { projectId, results, topAnchor } = body;
+    const { groupId, results, topAnchor } = body;
 
-    if (!projectId || !results || !topAnchor) {
+    if (!groupId || !results || !topAnchor) {
       return NextResponse.json(
-        { error: "projectId, results, and topAnchor are required" },
+        { error: "groupId, results, and topAnchor are required" },
         { status: 400 }
       );
     }
 
-    // Verify user has access to the project (must be a team member)
-    const membership = await prisma.teamMember.findFirst({
-      where: { userId: session.id, team: { projectId } },
+    // Verify user is a member of the group
+    const membership = await prisma.groupMember.findUnique({
+      where: { userId_groupId: { userId: session.id, groupId } },
     });
 
     if (!membership) {
       return NextResponse.json(
-        { error: "You are not a member of any team in this project" },
+        { error: "You are not a member of this group" },
         { status: 403 }
       );
     }
 
-    // Upsert: create or update
     const result = await prisma.careerAnchorResult.upsert({
       where: {
-        userId_projectId: { userId: session.id, projectId },
+        userId_groupId: { userId: session.id, groupId },
       },
       create: {
         userId: session.id,
-        projectId,
+        groupId,
         results: JSON.stringify(results),
         topAnchor,
       },
@@ -59,7 +58,7 @@ export async function POST(request: Request) {
   }
 }
 
-// Get career anchor results for a project
+// Get career anchor results for a group
 export async function GET(request: Request) {
   try {
     const session = await getSession();
@@ -68,65 +67,53 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get("projectId");
+    const groupId = searchParams.get("groupId");
 
-    if (!projectId) {
+    if (!groupId) {
       return NextResponse.json(
-        { error: "projectId query parameter is required" },
+        { error: "groupId query parameter is required" },
         { status: 400 }
       );
     }
 
-    // Verify user has access
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
+    const group = await prisma.assessmentGroup.findUnique({
+      where: { id: groupId },
     });
 
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    if (!group) {
+      return NextResponse.json({ error: "Group not found" }, { status: 404 });
     }
 
     const hasAccess =
-      project.professorId === session.id ||
-      !!(await prisma.teamMember.findFirst({
-        where: { userId: session.id, team: { projectId } },
+      group.professorId === session.id ||
+      !!(await prisma.groupMember.findUnique({
+        where: { userId_groupId: { userId: session.id, groupId } },
       }));
 
     if (!hasAccess) {
-      return NextResponse.json(
-        { error: "You do not have access to this project" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // Fetch all results for the project with user names
     const results = await prisma.careerAnchorResult.findMany({
-      where: { projectId },
+      where: { groupId },
       include: {
         user: { select: { id: true, name: true, email: true } },
       },
       orderBy: { createdAt: "asc" },
     });
 
-    // Parse JSON results
     const parsed = results.map((r) => ({
       id: r.id,
       userId: r.userId,
       userName: r.user.name,
-      userEmail: r.user.email,
       results: JSON.parse(r.results),
       topAnchor: r.topAnchor,
       createdAt: r.createdAt,
     }));
 
-    // Also return current user's result separately for convenience
     const myResult = parsed.find((r) => r.userId === session.id) || null;
 
-    return NextResponse.json({
-      results: parsed,
-      myResult,
-      role: session.role,
-    });
+    return NextResponse.json({ results: parsed, myResult, role: session.role });
   } catch (error) {
     console.error("Get career anchor error:", error);
     return NextResponse.json(
