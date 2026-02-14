@@ -94,12 +94,19 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-text-muted">
-        계정이 없으신가요?{" "}
-        <Link href="/register" className="font-medium text-primary hover:text-primary-light transition-colors">
-          회원가입
-        </Link>
-      </p>
+      <div className="mt-6 space-y-2 text-center text-sm text-text-muted">
+        <p>
+          계정이 없으신가요?{" "}
+          <Link href="/register" className="font-medium text-primary hover:text-primary-light transition-colors">
+            회원가입
+          </Link>
+        </p>
+        <p>
+          <Link href="/find-id" className="font-medium text-primary-lighter hover:text-primary transition-colors">
+            아이디(이메일) 찾기
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

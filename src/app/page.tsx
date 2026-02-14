@@ -36,7 +36,9 @@ export default function Home() {
             <p className="text-lg text-text-secondary leading-relaxed mb-10 max-w-lg">
               40개 문항의 커리어 앵커 검사를 통해
               <br className="hidden sm:block" />
-              자신의 핵심 가치와 커리어 성향을 파악하세요.
+              자신의 핵심 가치와 커리어 성향을 파악하고,
+              <br className="hidden sm:block" />
+              AI가 분석한 맞춤형 진로 리포트를 받아보세요.
             </p>
             <div className="flex items-center gap-4">
               <Link href="/register" className="btn-primary text-base px-7 py-3">무료로 시작하기</Link>
@@ -56,8 +58,8 @@ export default function Home() {
             </div>
             <div className="w-px h-10 bg-border" />
             <div>
-              <p className="text-3xl font-bold text-primary">6</p>
-              <p className="text-sm text-text-muted mt-1">점 척도</p>
+              <p className="text-3xl font-bold text-primary">AI</p>
+              <p className="text-sm text-text-muted mt-1">맞춤 리포트</p>
             </div>
           </div>
         </div>
@@ -76,17 +78,17 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h3 className="text-base font-semibold text-text mb-2">개인 진단</h3>
+              <h3 className="text-base font-semibold text-text mb-2">커리어 앵커 진단</h3>
               <p className="text-sm text-text-muted leading-relaxed">40개 문항에 6점 척도로 응답하고 8가지 커리어 앵커 유형을 분석합니다.</p>
             </div>
             <div className="group p-6 rounded-xl border border-border bg-surface-warm hover:bg-white hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
               <div className="w-11 h-11 rounded-lg bg-primary/8 flex items-center justify-center mb-5">
                 <svg className="w-5 h-5 text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                 </svg>
               </div>
-              <h3 className="text-base font-semibold text-text mb-2">그룹 분석</h3>
-              <p className="text-sm text-text-muted leading-relaxed">그룹의 커리어 앵커 평균을 분석하고 강점과 보완점을 파악합니다.</p>
+              <h3 className="text-base font-semibold text-text mb-2">AI 맞춤 리포트</h3>
+              <p className="text-sm text-text-muted leading-relaxed">AI가 강점과 보완점을 분석하고, 맞춤형 진로를 추천해드립니다.</p>
             </div>
             <div className="group p-6 rounded-xl border border-border bg-surface-warm hover:bg-white hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
               <div className="w-11 h-11 rounded-lg bg-primary/8 flex items-center justify-center mb-5">
@@ -134,7 +136,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">지금 시작하세요</h2>
           <p className="text-primary-soft/80 mb-10 max-w-md mx-auto leading-relaxed">
-            교수님은 그룹을 만들고, 학생은 참여 코드로 바로 시작할 수 있습니다.
+            커리어 앵커 검사와 AI 맞춤 리포트를 무료로 이용해보세요.
           </p>
           <Link href="/register" className="inline-flex items-center gap-2 bg-white text-primary font-medium text-base px-8 py-3 rounded-lg hover:bg-surface-warm transition-all hover:shadow-lg">
             무료로 시작하기

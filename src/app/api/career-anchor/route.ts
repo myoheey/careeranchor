@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
-// Save or update career anchor results
 export async function POST(request: Request) {
   try {
     const session = await getSession();
@@ -11,40 +10,26 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { groupId, results, topAnchor } = body;
+    const { results, topAnchor } = body;
 
-    if (!groupId || !results || !topAnchor) {
+    if (!results || !topAnchor) {
       return NextResponse.json(
-        { error: "groupId, results, and topAnchor are required" },
+        { error: "results and topAnchor are required" },
         { status: 400 }
       );
     }
 
-    // Verify user is a member of the group
-    const membership = await prisma.groupMember.findUnique({
-      where: { userId_groupId: { userId: session.id, groupId } },
-    });
-
-    if (!membership) {
-      return NextResponse.json(
-        { error: "You are not a member of this group" },
-        { status: 403 }
-      );
-    }
-
     const result = await prisma.careerAnchorResult.upsert({
-      where: {
-        userId_groupId: { userId: session.id, groupId },
-      },
+      where: { userId: session.id },
       create: {
         userId: session.id,
-        groupId,
         results: JSON.stringify(results),
         topAnchor,
       },
       update: {
         results: JSON.stringify(results),
         topAnchor,
+        aiReport: null,
       },
     });
 
@@ -58,62 +43,31 @@ export async function POST(request: Request) {
   }
 }
 
-// Get career anchor results for a group
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const groupId = searchParams.get("groupId");
-
-    if (!groupId) {
-      return NextResponse.json(
-        { error: "groupId query parameter is required" },
-        { status: 400 }
-      );
-    }
-
-    const group = await prisma.assessmentGroup.findUnique({
-      where: { id: groupId },
+    const result = await prisma.careerAnchorResult.findUnique({
+      where: { userId: session.id },
     });
 
-    if (!group) {
-      return NextResponse.json({ error: "Group not found" }, { status: 404 });
+    if (!result) {
+      return NextResponse.json({ result: null });
     }
 
-    const hasAccess =
-      group.professorId === session.id ||
-      !!(await prisma.groupMember.findUnique({
-        where: { userId_groupId: { userId: session.id, groupId } },
-      }));
-
-    if (!hasAccess) {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
-    }
-
-    const results = await prisma.careerAnchorResult.findMany({
-      where: { groupId },
-      include: {
-        user: { select: { id: true, name: true, email: true } },
+    return NextResponse.json({
+      result: {
+        id: result.id,
+        results: JSON.parse(result.results),
+        topAnchor: result.topAnchor,
+        aiReport: result.aiReport ? JSON.parse(result.aiReport) : null,
+        createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
       },
-      orderBy: { createdAt: "asc" },
     });
-
-    const parsed = results.map((r) => ({
-      id: r.id,
-      userId: r.userId,
-      userName: r.user.name,
-      results: JSON.parse(r.results),
-      topAnchor: r.topAnchor,
-      createdAt: r.createdAt,
-    }));
-
-    const myResult = parsed.find((r) => r.userId === session.id) || null;
-
-    return NextResponse.json({ results: parsed, myResult, role: session.role });
   } catch (error) {
     console.error("Get career anchor error:", error);
     return NextResponse.json(

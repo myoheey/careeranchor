@@ -18,11 +18,11 @@ export async function sendPasswordResetEmail(
   await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to,
-    subject: "[EntreLMS] 비밀번호 재설정",
+    subject: "[CareerAnchor] 비밀번호 재설정",
     html: `
       <div style="max-width:480px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a">
         <div style="padding:32px 24px;background:#0f172a;border-radius:8px 8px 0 0;text-align:center">
-          <h1 style="margin:0;font-size:20px;color:#fff">Entre<span style="color:#3b82f6">LMS</span></h1>
+          <h1 style="margin:0;font-size:20px;color:#fff">Career<span style="color:#3b82f6">Anchor</span></h1>
         </div>
         <div style="padding:32px 24px;background:#fff;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px">
           <p style="margin:0 0 16px;font-size:15px">안녕하세요, <strong>${name}</strong>님.</p>

@@ -6,18 +6,11 @@ import { createToken } from "@/lib/auth";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, name, role } = body;
+    const { email, password, name } = body;
 
-    if (!email || !password || !name || !role) {
+    if (!email || !password || !name) {
       return NextResponse.json(
-        { error: "이메일, 비밀번호, 이름, 역할을 모두 입력해주세요." },
-        { status: 400 }
-      );
-    }
-
-    if (!["PROFESSOR", "STUDENT"].includes(role)) {
-      return NextResponse.json(
-        { error: "역할은 교수자 또는 학생이어야 합니다." },
+        { error: "이메일, 비밀번호, 이름을 모두 입력해주세요." },
         { status: 400 }
       );
     }
@@ -40,7 +33,6 @@ export async function POST(request: Request) {
         email,
         password: hashedPassword,
         name,
-        role,
       },
     });
 
@@ -48,7 +40,6 @@ export async function POST(request: Request) {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role as "PROFESSOR" | "STUDENT",
     });
 
     const response = NextResponse.json(
@@ -57,7 +48,6 @@ export async function POST(request: Request) {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
         },
       },
       { status: 201 }

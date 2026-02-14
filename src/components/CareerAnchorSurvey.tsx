@@ -7,7 +7,6 @@ import {
 } from "@/lib/phase-data";
 
 interface CareerAnchorSurveyProps {
-  groupId: string;
   onComplete?: (results: Record<string, number>) => void;
 }
 
@@ -23,7 +22,6 @@ const LIKERT_LABELS = [
 const QUESTIONS_PER_PAGE = 5;
 
 export default function CareerAnchorSurvey({
-  groupId,
   onComplete,
 }: CareerAnchorSurveyProps) {
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -42,11 +40,11 @@ export default function CareerAnchorSurvey({
   useEffect(() => {
     async function loadExisting() {
       try {
-        const res = await fetch(`/api/career-anchor?groupId=${groupId}`);
+        const res = await fetch("/api/career-anchor");
         if (res.ok) {
           const data = await res.json();
-          if (data.myResult) {
-            setExistingResults(data.myResult.results);
+          if (data.result) {
+            setExistingResults(data.result.results);
             setShowResults(true);
           }
         }
@@ -57,7 +55,7 @@ export default function CareerAnchorSurvey({
       }
     }
     loadExisting();
-  }, [groupId]);
+  }, []);
 
   const currentQuestions = useMemo(() => {
     const start = currentPage * QUESTIONS_PER_PAGE;
@@ -109,7 +107,7 @@ export default function CareerAnchorSurvey({
       const res = await fetch("/api/career-anchor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ groupId, results, topAnchor }),
+        body: JSON.stringify({ results, topAnchor }),
       });
       if (res.ok) {
         setSaved(true);
@@ -120,12 +118,20 @@ export default function CareerAnchorSurvey({
     } finally {
       setSaving(false);
     }
-  }, [results, groupId, onComplete]);
+  }, [results, onComplete]);
+
+  const handleRetake = useCallback(() => {
+    setShowResults(false);
+    setExistingResults(null);
+    setAnswers({});
+    setCurrentPage(0);
+    setSaved(false);
+  }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <svg className="animate-spin w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+        <svg className="animate-spin w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -210,17 +216,14 @@ export default function CareerAnchorSurvey({
             ))}
           </div>
         </div>
-        {!existingResults && (
-          <div className="flex justify-center gap-3">
-            <button onClick={() => { setShowResults(false); setExistingResults(null); }} className="btn-outline">다시 검사하기</button>
+        <div className="flex justify-center gap-3">
+          <button onClick={handleRetake} className="btn-outline">다시 검사하기</button>
+          {!existingResults && (
             <button onClick={handleSave} disabled={saving || saved} className="btn-primary px-8 disabled:opacity-60">
               {saved ? "저장 완료!" : saving ? "저장 중..." : "결과 저장하기"}
             </button>
-          </div>
-        )}
-        {existingResults && (
-          <div className="text-center"><p className="text-sm text-slate-400">이미 검사를 완료했습니다.</p></div>
-        )}
+          )}
+        </div>
       </div>
     );
   }
@@ -230,10 +233,10 @@ export default function CareerAnchorSurvey({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-slate-500">진행률: {answeredCount} / {totalQuestions}</span>
-          <span className="text-sm font-semibold text-blue-600">{Math.round(progress)}%</span>
+          <span className="text-sm font-semibold text-primary">{Math.round(progress)}%</span>
         </div>
         <div className="w-full h-2 bg-slate-100 rounded-lg overflow-hidden">
-          <div className="h-full rounded-lg transition-all duration-300 bg-blue-600" style={{ width: `${progress}%` }} />
+          <div className="h-full rounded-lg transition-all duration-300 bg-primary" style={{ width: `${progress}%` }} />
         </div>
         <div className="flex justify-between mt-1.5">
           <span className="text-xs text-slate-400">Page {currentPage + 1} / {totalPages}</span>
@@ -244,7 +247,7 @@ export default function CareerAnchorSurvey({
         {currentQuestions.map((q) => (
           <div key={q.index} className="bg-white rounded-lg border border-slate-200 p-4">
             <div className="flex items-start gap-3 mb-4">
-              <span className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg bg-blue-50 text-blue-600 text-xs font-semibold">{q.index + 1}</span>
+              <span className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-xs font-semibold">{q.index + 1}</span>
               <p className="text-sm font-medium text-slate-900 pt-0.5 leading-relaxed">{q.text}</p>
             </div>
             <div className="grid grid-cols-6 gap-1.5 ml-10">
@@ -252,9 +255,9 @@ export default function CareerAnchorSurvey({
                 const value = i + 1;
                 const isSelected = answers[q.index] === value;
                 return (
-                  <button key={value} onClick={() => handleAnswer(q.index, value)} className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-lg border transition-colors text-center ${isSelected ? "border-blue-600 bg-blue-50" : "border-slate-200 bg-white hover:border-blue-300"}`}>
-                    <span className={`text-lg font-semibold ${isSelected ? "text-blue-600" : "text-slate-400"}`}>{value}</span>
-                    <span className={`text-[10px] leading-tight ${isSelected ? "text-blue-600 font-medium" : "text-slate-400"}`}>{label}</span>
+                  <button key={value} onClick={() => handleAnswer(q.index, value)} className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-lg border transition-colors text-center ${isSelected ? "border-primary bg-primary/5" : "border-slate-200 bg-white hover:border-primary/40"}`}>
+                    <span className={`text-lg font-semibold ${isSelected ? "text-primary" : "text-slate-400"}`}>{value}</span>
+                    <span className={`text-[10px] leading-tight ${isSelected ? "text-primary font-medium" : "text-slate-400"}`}>{label}</span>
                   </button>
                 );
               })}
@@ -266,7 +269,7 @@ export default function CareerAnchorSurvey({
         <button onClick={() => setCurrentPage((p) => Math.max(0, p - 1))} disabled={currentPage === 0} className="btn-outline disabled:opacity-40 disabled:cursor-not-allowed">이전</button>
         <div className="flex gap-1.5">
           {Array.from({ length: totalPages }, (_, i) => (
-            <button key={i} onClick={() => setCurrentPage(i)} className={`w-2 h-2 rounded-full transition-colors ${i === currentPage ? "bg-blue-600" : "bg-slate-200 hover:bg-slate-300"}`} />
+            <button key={i} onClick={() => setCurrentPage(i)} className={`w-2 h-2 rounded-full transition-colors ${i === currentPage ? "bg-primary" : "bg-slate-200 hover:bg-slate-300"}`} />
           ))}
         </div>
         {currentPage < totalPages - 1 ? (

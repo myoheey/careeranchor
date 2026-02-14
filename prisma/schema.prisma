@@ -12,53 +12,22 @@ model User {
   email     String   @unique
   password  String
   name      String
-  role      String   // PROFESSOR or STUDENT
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  groups              AssessmentGroup[]
-  groupMemberships    GroupMember[]
   careerAnchorResults CareerAnchorResult[]
   passwordResetTokens PasswordResetToken[]
 }
 
-model AssessmentGroup {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  joinCode    String   @unique
-  professorId String
-  professor   User     @relation(fields: [professorId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  members             GroupMember[]
-  careerAnchorResults CareerAnchorResult[]
-}
-
-model GroupMember {
-  id       String   @id @default(uuid())
-  userId   String
-  groupId  String
-  user     User     @relation(fields: [userId], references: [id])
-  group    AssessmentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  joinedAt DateTime @default(now())
-
-  @@unique([userId, groupId])
-}
-
 model CareerAnchorResult {
   id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  groupId   String
-  group     AssessmentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   results   String   // JSON: { TF: 4.2, GM: 3.8, ... }
   topAnchor String   // e.g. "TF"
+  aiReport  String?  // AI-generated report JSON
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@unique([userId, groupId])
 }
 
 model PasswordResetToken {

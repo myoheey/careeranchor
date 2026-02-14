@@ -39,7 +39,6 @@ export async function POST(request: Request) {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role as "PROFESSOR" | "STUDENT",
     });
 
     const response = NextResponse.json({
@@ -47,7 +46,6 @@ export async function POST(request: Request) {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role,
       },
     });
 

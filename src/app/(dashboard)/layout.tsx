@@ -15,8 +15,8 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-surface-warm">
-      <Navbar user={{ name: session.name, role: session.role }} />
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <Navbar user={{ name: session.name }} />
+      <main className="max-w-4xl mx-auto px-6 py-8">
         {children}
       </main>
     </div>
