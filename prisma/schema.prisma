@@ -12,6 +12,12 @@ model User {
   email     String   @unique
   password  String
   name      String
+  role      String   @default("user") // "user" | "admin"
+  gender    String?  // "male" | "female" | "other"
+  ageRange  String?  // "20s" | "30s" | "40s" | "50s" | "60+"
+  job       String?  // 현재 직업
+  industry  String?  // 업종/산업
+  experience String? // 경력: "0-2" | "3-5" | "6-10" | "11-15" | "16-20" | "20+"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 interface User {
   name: string;
+  role?: string;
 }
 
 interface NavbarProps {
@@ -70,6 +71,9 @@ export default function Navbar({ user: userProp }: NavbarProps) {
           {user && (
             <div className="hidden md:flex items-center gap-6">
               <Link href="/dashboard" className="text-sm text-text-muted hover:text-primary transition-colors">대시보드</Link>
+              {user.role === "admin" && (
+                <Link href="/admin" className="text-sm text-text-muted hover:text-primary transition-colors">관리자</Link>
+              )}
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">{user.name.charAt(0)}</div>
@@ -101,6 +105,9 @@ export default function Navbar({ user: userProp }: NavbarProps) {
               <span className="text-sm text-text-secondary font-medium">{user.name}</span>
             </div>
             <Link href="/dashboard" className="block text-sm text-text-secondary hover:text-primary py-1" onClick={() => setMobileMenuOpen(false)}>대시보드</Link>
+            {user.role === "admin" && (
+              <Link href="/admin" className="block text-sm text-text-secondary hover:text-primary py-1" onClick={() => setMobileMenuOpen(false)}>관리자</Link>
+            )}
             <button onClick={handleLogout} disabled={loggingOut} className="text-sm text-red-500 hover:text-red-600 disabled:opacity-50">
               {loggingOut ? "로그아웃 중..." : "로그아웃"}
             </button>
