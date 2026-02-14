@@ -74,8 +74,16 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     console.error("Registration error:", error);
-    const message =
-      error instanceof Error ? error.message : "서버 오류가 발생했습니다.";
+    let message = "서버 오류가 발생했습니다.";
+    if (error instanceof Error) {
+      if (error.message.includes("connect") || error.message.includes("ECONNREFUSED")) {
+        message = "데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.";
+      } else if (error.message.includes("does not exist") || error.message.includes("relation")) {
+        message = "데이터베이스 테이블이 초기화되지 않았습니다.";
+      } else {
+        message = error.message;
+      }
+    }
     return NextResponse.json(
       { error: message },
       { status: 500 }
