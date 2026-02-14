@@ -1,84 +1,152 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ProfileForm from "@/components/ProfileForm";
 import CareerAnchorSurvey from "@/components/CareerAnchorSurvey";
 import AIReport from "@/components/AIReport";
 
-type Tab = "survey" | "report";
+type Step = "profile" | "survey" | "report";
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("survey");
+  const [step, setStep] = useState<Step>("profile");
   const [hasResults, setHasResults] = useState(false);
+  const [hasProfile, setHasProfile] = useState(false);
   const [aiReport, setAiReport] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadState() {
       try {
-        const res = await fetch("/api/career-anchor");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.result) {
+        const [profileRes, anchorRes] = await Promise.all([
+          fetch("/api/profile"),
+          fetch("/api/career-anchor"),
+        ]);
+
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          const p = profileData.profile;
+          if (p && (p.gender || p.ageRange || p.job)) {
+            setHasProfile(true);
+          }
+        }
+
+        if (anchorRes.ok) {
+          const anchorData = await anchorRes.json();
+          if (anchorData.result) {
             setHasResults(true);
-            if (data.result.aiReport) {
-              setAiReport(data.result.aiReport);
+            if (anchorData.result.aiReport) {
+              setAiReport(anchorData.result.aiReport);
             }
           }
         }
       } catch {
         // ignore
+      } finally {
+        setLoading(false);
       }
     }
     loadState();
   }, []);
 
+  useEffect(() => {
+    if (!loading) {
+      if (hasResults) {
+        setStep("report");
+      } else if (hasProfile) {
+        setStep("survey");
+      } else {
+        setStep("profile");
+      }
+    }
+  }, [loading, hasProfile, hasResults]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <svg className="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-text mb-1">커리어 앵커 진단</h1>
-        <p className="text-sm text-text-muted">검사를 완료하고 AI 분석 리포트를 확인하세요</p>
+      {/* Step Indicator */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-6">
+          {[
+            { key: "profile", label: "기본 정보", num: 1 },
+            { key: "survey", label: "진단 검사", num: 2 },
+            { key: "report", label: "AI 리포트", num: 3 },
+          ].map((s, i) => {
+            const isActive = step === s.key;
+            const isCompleted =
+              (s.key === "profile" && hasProfile) ||
+              (s.key === "survey" && hasResults) ||
+              (s.key === "report" && !!aiReport);
+            return (
+              <div key={s.key} className="flex items-center gap-2 flex-1">
+                <button
+                  onClick={() => {
+                    if (s.key === "profile") setStep("profile");
+                    else if (s.key === "survey" && hasProfile) setStep("survey");
+                    else if (s.key === "report" && hasResults) setStep("report");
+                  }}
+                  className={`flex items-center gap-2 w-full py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${
+                    isActive
+                      ? "bg-primary text-white shadow-sm"
+                      : isCompleted
+                        ? "bg-primary/10 text-primary"
+                        : "bg-slate-100 text-slate-400"
+                  }`}
+                >
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                    isActive ? "bg-white/20" : isCompleted ? "bg-primary/20" : "bg-slate-200"
+                  }`}>
+                    {isCompleted && !isActive ? (
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      s.num
+                    )}
+                  </span>
+                  <span className="hidden sm:inline">{s.label}</span>
+                </button>
+                {i < 2 && <div className="w-6 h-px bg-slate-200 shrink-0" />}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex gap-1 bg-white rounded-lg border border-slate-200 p-1 mb-6">
-        <button
-          onClick={() => setActiveTab("survey")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-all ${
-            activeTab === "survey"
-              ? "bg-primary text-white shadow-sm"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-          }`}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
-          </svg>
-          진단 검사
-        </button>
-        <button
-          onClick={() => setActiveTab("report")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-all ${
-            activeTab === "report"
-              ? "bg-primary text-white shadow-sm"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-          }`}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-          </svg>
-          AI 리포트
-        </button>
-      </div>
+      {/* Step Content */}
+      {step === "profile" && (
+        <ProfileForm
+          onComplete={() => {
+            setHasProfile(true);
+            setStep("survey");
+          }}
+          onSkip={() => {
+            setHasProfile(true);
+            setStep("survey");
+          }}
+        />
+      )}
 
-      {/* Tab Content */}
-      {activeTab === "survey" && (
+      {step === "survey" && (
         <CareerAnchorSurvey
           onComplete={() => {
             setHasResults(true);
             setAiReport(null);
-            setTimeout(() => setActiveTab("report"), 500);
+            setStep("report");
           }}
         />
       )}
-      {activeTab === "report" && (
+
+      {step === "report" && (
         <AIReport existingReport={aiReport} hasResults={hasResults} />
       )}
     </div>
