@@ -16,22 +16,22 @@ export default function AuthLayout({
 
         <div className="relative">
           <Link href="/" className="text-xl font-bold text-white tracking-tight">
-            Entre<span className="text-primary-soft">LMS</span>
+            Career<span className="text-primary-soft">Anchor</span>
           </Link>
         </div>
 
         <div className="relative">
           <h2 className="text-2xl font-bold text-white leading-snug mb-4">
-            창의적 문제해결을 위한
-            <br />학습 플랫폼
+            나의 커리어 성향을
+            <br />발견하세요
           </h2>
           <p className="text-sm text-primary-soft/70 leading-relaxed max-w-xs">
-            커리어 앵커 분석, 팀 협업, 단계별 학습을 통해 체계적인 앙트러프러너십 교육을 경험하세요.
+            40개 문항의 커리어 앵커 검사와 AI 맞춤 리포트로 자신의 핵심 가치와 진로 방향을 파악하세요.
           </p>
         </div>
 
         <p className="relative text-xs text-white/30">
-          &copy; {new Date().getFullYear()} EntreLMS
+          &copy; {new Date().getFullYear()} CareerAnchor
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export default function AuthLayout({
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <Link href="/" className="lg:hidden mb-8 flex items-center gap-1">
           <span className="text-xl font-bold text-primary tracking-tight">
-            Entre<span className="text-primary-lighter">LMS</span>
+            Career<span className="text-primary-lighter">Anchor</span>
           </span>
         </Link>
 
@@ -48,7 +48,7 @@ export default function AuthLayout({
         </div>
 
         <p className="lg:hidden mt-8 text-xs text-text-muted">
-          &copy; {new Date().getFullYear()} EntreLMS
+          &copy; {new Date().getFullYear()} CareerAnchor
         </p>
       </div>
     </div>
