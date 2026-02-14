@@ -91,7 +91,7 @@ export async function POST() {
     const results = JSON.parse(existing.results) as Record<string, number>;
     const prompt = buildPrompt(results, session.name);
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
         { error: "AI 서비스가 설정되지 않았습니다. 관리자에게 문의하세요." },
@@ -99,24 +99,26 @@ export async function POST() {
       );
     }
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-5-20250929",
-        max_tokens: 2048,
-        messages: [
-          { role: "user", content: prompt },
-        ],
-      }),
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            { parts: [{ text: prompt }] },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
-      console.error("Anthropic API error:", response.status, await response.text());
+      console.error("Gemini API error:", response.status, await response.text());
       return NextResponse.json(
         { error: "AI 리포트 생성에 실패했습니다. 잠시 후 다시 시도해주세요." },
         { status: 502 }
@@ -124,7 +126,7 @@ export async function POST() {
     }
 
     const aiResponse = await response.json();
-    const content = aiResponse.content?.[0]?.text || "";
+    const content = aiResponse.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     let report;
     try {
@@ -132,7 +134,7 @@ export async function POST() {
       if (!jsonMatch) throw new Error("No JSON found");
       report = JSON.parse(jsonMatch[0]);
     } catch {
-      console.error("Failed to parse AI response:", content);
+      console.error("Failed to parse Gemini response:", content);
       return NextResponse.json(
         { error: "AI 응답을 처리하는 데 실패했습니다." },
         { status: 500 }
